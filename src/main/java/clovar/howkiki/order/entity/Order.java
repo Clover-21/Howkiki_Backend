@@ -1,11 +1,11 @@
 package clovar.howkiki.order.entity;
 
+import clovar.howkiki.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Getter
-public class Order {
+@Table(name = "orders")
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

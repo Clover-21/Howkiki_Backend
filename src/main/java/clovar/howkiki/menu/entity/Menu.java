@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
@@ -39,9 +38,6 @@ public class Menu extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @NotNull
     private MenuStatus status; // AVAILABLE, OUT_OF_STOCK, NOT_AVAILABLE
-
-    @NotNull
-    private Boolean isSetMenu;
 
     @Column(length = 500)
     private String menuImgUrl;
