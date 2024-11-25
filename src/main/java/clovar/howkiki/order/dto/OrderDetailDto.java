@@ -1,7 +1,10 @@
 package clovar.howkiki.order.dto;
 
+import clovar.howkiki.order.entity.Order;
+import clovar.howkiki.order.entity.OrderDetail;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +12,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@Builder
 public class OrderDetailDto {
 
     @NotNull(message = "메뉴 이름은 필수입니다.")
@@ -18,4 +22,15 @@ public class OrderDetailDto {
     @Min(value = 1, message = "수량은 1 이상이어야 합니다.")
     private Long quantity;
 
+    public OrderDetailDto(String menuName, Long quantity) {
+        this.menuName = menuName;
+        this.quantity = quantity;
+    }
+
+    public static OrderDetailDto from (OrderDetail orderDetail){
+        return new OrderDetailDto(
+                orderDetail.getMenu().getName(),
+                orderDetail.getQuantity()
+        );
+    }
 }
