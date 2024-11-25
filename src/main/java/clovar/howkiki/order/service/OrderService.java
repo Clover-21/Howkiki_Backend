@@ -2,21 +2,21 @@ package clovar.howkiki.order.service;
 
 import clovar.howkiki.menu.entity.Menu;
 import clovar.howkiki.menu.repository.MenuRepository;
-import clovar.howkiki.order.dto.OrderDetailDto;
-import clovar.howkiki.order.dto.OrderMenuListDetailDto;
-import clovar.howkiki.order.dto.OrderResponseDto;
-import clovar.howkiki.order.dto.OrderRequestDto;
+import clovar.howkiki.order.dto.*;
 import clovar.howkiki.order.entity.Order;
 import clovar.howkiki.order.entity.OrderDetail;
 import clovar.howkiki.order.entity.OrderStatus;
 import clovar.howkiki.order.repository.OrderDetailRepository;
 import clovar.howkiki.order.repository.OrderRepository;
+import clovar.howkiki.store.repository.StoreRepository;
+import clovar.howkiki.store.entity.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final MenuRepository menuRepository;
+    private final StoreRepository storeRepository;
 
     /* 주문 생성 */
     public OrderResponseDto createNewOrder(Long storeId, OrderRequestDto requestDto) {
@@ -34,6 +35,8 @@ public class OrderService {
         validateOrderRequest(requestDto);
 
         // 가게 객체 찾기 (추후)
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 가게 없음"));
 
         // requestDto에서 주문한 메뉴이름과 수량이 담긴 OrderDetails
         List<OrderDetailDto> orderDetails = requestDto.getOrderDetails();
@@ -43,6 +46,7 @@ public class OrderService {
 
         // Order 객체 생성
         Order order = Order.builder()
+                .storeId(storeId)
                 .tableNumber(requestDto.getTableNumber())
                 .orderPrice(orderPrice)
                 .status(OrderStatus.PENDING)  // 기본상태 : PENDING
@@ -55,6 +59,7 @@ public class OrderService {
 
         // 응답 dto 생성 및 반환
         return OrderResponseDto.from(savedOrder, savedOrderDetail);
+
     }
 
     // 주문 요청 검증 메서드
@@ -70,12 +75,12 @@ public class OrderService {
                 .mapToLong(detail -> {
                     Menu menu = menuRepository.findMenuByName(detail.getMenuName())
                             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다: " + detail.getMenuName()));
-                    return menu.getCost() * detail.getQuantity();
+                    return (menu.getCost() * detail.getQuantity());
                 })
                 .sum();
     }
 
-    /* 주문 상세 생성 */
+    // 주문 상세 생성
     private List<OrderMenuListDetailDto> createOrderDetail(Order order, List<OrderDetailDto> orderList) {
         List<OrderMenuListDetailDto> result = new ArrayList<>();  // 변환된 DTO를 저장할 리스트
 
@@ -100,5 +105,73 @@ public class OrderService {
         return result;  // 변환된 DTO 리스트 반환
     }
 
+
+    /* 모든 주문 목록 조회 */
+    public OrderListResponseDto getOrderList(Long storeId) {
+
+        // 해당 가게의 모든 주문 목록 조회
+        List<Order> orders = orderRepository.findOrderByStoreId(storeId);
+
+        // 각 주문에 대해 orderDetail을 가져와서 menuSummary 생성
+        List<OrderListDetailResponseDto> orderListDetailResponseDtos = new ArrayList<>();
+
+        for (Order order : orders) {
+            // 주문의 orderDetail들을 OrderDetailDto로 변환
+            List<OrderDetailDto> menuSummary = order.getOrderDetails().stream()
+                    .map(orderDetail -> OrderDetailDto.builder()
+                            .menuName(orderDetail.getMenu().getName()) // 메뉴 이름
+                            .quantity(orderDetail.getQuantity()) // 수량
+                            .build())
+                    .collect(Collectors.toList());
+
+            // 주문의 상세 정보 생성
+            OrderListDetailResponseDto responseDto = OrderListDetailResponseDto.builder()
+                    .orderId(order.getId())
+                    .tableNumber(order.getTableNumber())
+                    .orderPrice(order.getOrderPrice())
+                    .status(order.getStatus())
+                    .createdAt(order.getCreatedAt())
+                    .menuSummary(menuSummary) // 메뉴 요약
+                    .build();
+
+            // 리스트에 추가
+            orderListDetailResponseDtos.add(responseDto);
+        }
+
+        return new OrderListResponseDto(orderListDetailResponseDtos);
+
+    }
+
+
+    /* 주문 상세 조회 */
+    public OrderResponseDto getOrder(Long storeId, Long orderId) {
+
+        // order 객체 찾기
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 id의 주문이 존재하지 않습니다."));
+
+        // orderDetail 객체 찾기
+        List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(orderId);
+
+        // OrderDetail 객체를 DTO로 변환하여 리스트 생성
+        List<OrderMenuListDetailDto> menuList = orderDetails.stream()
+                .map(OrderMenuListDetailDto::from)
+                .collect(Collectors.toList());
+
+        // 응답 dto 생성
+        OrderResponseDto responseDto = OrderResponseDto.builder()
+                .orderId(order.getId())
+                .tableNumber(order.getTableNumber())
+                .orderPrice(order.getOrderPrice())
+                .status(order.getStatus())
+                .expectedPrepTime(order.getExpectedPrepTime())
+                .createdAt(order.getCreatedAt())
+                .modifiedAt(order.getModifiedAt())
+                .menuList(menuList)
+                .build();
+
+        return responseDto;
+
+    }
 
 }
