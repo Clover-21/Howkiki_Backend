@@ -4,6 +4,7 @@ import clovar.howkiki.global.response.ApiResponse;
 import clovar.howkiki.order.dto.OrderResponseDto;
 import clovar.howkiki.order.dto.OrderRequestDto;
 import clovar.howkiki.order.service.OrderService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +28,12 @@ public class OrderController {
         );
         return response;
 
+    }
+
+    /* 테스트용 */
+    @GetMapping
+    public String test(){
+        System.out.println("테스트");
+        return "for test";
     }
 }
