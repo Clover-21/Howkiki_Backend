@@ -1,6 +1,7 @@
 package clovar.howkiki.order.controller;
 
 import clovar.howkiki.global.response.ApiResponse;
+import clovar.howkiki.order.dto.OrderListResponseDto;
 import clovar.howkiki.order.dto.OrderResponseDto;
 import clovar.howkiki.order.dto.OrderRequestDto;
 import clovar.howkiki.order.service.OrderService;
@@ -30,10 +31,15 @@ public class OrderController {
 
     }
 
-    /* 테스트용 */
+    /* 주문 목록 조회 */
     @GetMapping
-    public String test(){
-        System.out.println("테스트");
-        return "for test";
+    public ApiResponse<OrderListResponseDto> getOrderList(@PathVariable(name = "storeId") Long storeId){
+        OrderListResponseDto responseDto = orderService.getOrderList(storeId);
+        ApiResponse<OrderListResponseDto> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "주문 목록 조회 성공",
+                responseDto
+        );
+        return response;
     }
 }

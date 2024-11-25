@@ -1,6 +1,7 @@
 package clovar.howkiki.order.entity;
 
 import clovar.howkiki.global.entity.BaseEntity;
+import clovar.howkiki.store.entity.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Long storeId;
 
     @Column(length = 10)
     private Long tableNumber;
