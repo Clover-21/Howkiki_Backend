@@ -40,15 +40,15 @@ jobs:
       # GitHub Secrets에 추가한 APPLICATION_YML로 application.yml 생성
       - name: make application.yml
         run: |
-          mkdir ./community/src/main/resources 
-          cd ./community/src/main/resources
+          mkdir ./howkiki/src/main/resources 
+          cd ./howkiki/src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
 
       # build
       - name: Build with Gradle
         run: |
-          cd community
+          cd howkiki
           chmod +x ./gradlew
           ./gradlew build -x test
 
@@ -67,7 +67,7 @@ jobs:
             --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
             --ignore-hidden-files \
             --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-            --source ./community
+            --source ./howkiki
 
       # S3에 업로드된 애플리케이션을 배포
       - name: Deploy to AWS EC2 from S3
