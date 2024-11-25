@@ -59,6 +59,7 @@ public class OrderService {
 
         // 응답 dto 생성 및 반환
         return OrderResponseDto.from(savedOrder, savedOrderDetail);
+
     }
 
     // 주문 요청 검증 메서드
@@ -79,7 +80,7 @@ public class OrderService {
                 .sum();
     }
 
-    /* 주문 상세 생성 */
+    // 주문 상세 생성
     private List<OrderMenuListDetailDto> createOrderDetail(Order order, List<OrderDetailDto> orderList) {
         List<OrderMenuListDetailDto> result = new ArrayList<>();  // 변환된 DTO를 저장할 리스트
 
@@ -138,6 +139,38 @@ public class OrderService {
         }
 
         return new OrderListResponseDto(orderListDetailResponseDtos);
+
+    }
+
+
+    /* 주문 상세 조회 */
+    public OrderResponseDto getOrder(Long storeId, Long orderId) {
+
+        // order 객체 찾기
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 id의 주문이 존재하지 않습니다."));
+
+        // orderDetail 객체 찾기
+        List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(orderId);
+
+        // OrderDetail 객체를 DTO로 변환하여 리스트 생성
+        List<OrderMenuListDetailDto> menuList = orderDetails.stream()
+                .map(OrderMenuListDetailDto::from)
+                .collect(Collectors.toList());
+
+        // 응답 dto 생성
+        OrderResponseDto responseDto = OrderResponseDto.builder()
+                .orderId(order.getId())
+                .tableNumber(order.getTableNumber())
+                .orderPrice(order.getOrderPrice())
+                .status(order.getStatus())
+                .expectedPrepTime(order.getExpectedPrepTime())
+                .createdAt(order.getCreatedAt())
+                .modifiedAt(order.getModifiedAt())
+                .menuList(menuList)
+                .build();
+
+        return responseDto;
 
     }
 
