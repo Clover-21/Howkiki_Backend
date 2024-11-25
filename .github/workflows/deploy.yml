@@ -48,7 +48,6 @@ jobs:
       # build
       - name: Build with Gradle
         run: |
-          cd howkiki
           chmod +x ./gradlew
           ./gradlew build -x test
 
