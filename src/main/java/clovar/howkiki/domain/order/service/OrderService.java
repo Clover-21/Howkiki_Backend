@@ -8,7 +8,6 @@ import clovar.howkiki.domain.order.entity.OrderDetail;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.repository.OrderDetailRepository;
 import clovar.howkiki.domain.order.repository.OrderRepository;
-import clovar.howkiki.order.dto.*;
 import clovar.howkiki.domain.store.repository.StoreRepository;
 import clovar.howkiki.domain.store.entity.Store;
 import lombok.RequiredArgsConstructor;
