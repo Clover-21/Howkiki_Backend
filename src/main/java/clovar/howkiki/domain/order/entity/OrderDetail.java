@@ -12,11 +12,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Getter
+@Table(name = "OrderDetails")
 public class OrderDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long orderDetailId;
 
     @ManyToOne
     @JoinColumn(name = "orderId", nullable = false)
@@ -27,7 +28,7 @@ public class OrderDetail extends BaseEntity {
     private Menu menu;
 
     @NotNull
-    @Column(length = 100)
+    @Column(length = 10)
     private Long quantity;
 
     @NotNull

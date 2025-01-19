@@ -12,29 +12,20 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Getter
+@Table(name = "Stores")
 public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long storeId;
 
     @NotNull
     @Column(length = 50)
     private String storeName;
 
     @NotNull
-    private String address;
+    private StoreStatus storeStatus;
 
-    @NotNull
-    @Column(length = 500)
-    private String operatingHours;
 
-    @NotNull
-    @Column(length = 20)
-    private String phoneNumber;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private StoreCategory storeCategory; // ITALIAN, JAPANESE, etc.
 
 }

@@ -1,5 +1,6 @@
 package clovar.howkiki.domain.order.entity;
 
+import clovar.howkiki.domain.store.entity.Store;
 import clovar.howkiki.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -14,15 +15,26 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Getter
-@Table(name = "orders")
+@Table(name = "Orders")
 public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long orderId;
 
-    private Long storeId;
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "storeId", nullable = false)
+    private Store store;
 
+//    @NotNull
+    @Column(length = 255)
+    private String sessionToken;
+
+    @NotNull
+    private Boolean isTakeOut;
+
+    @NotNull
     @Column(length = 10)
     private Long tableNumber;
 
@@ -32,10 +44,12 @@ public class Order extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private OrderStatus status; // PENDING, PROCESSING, COMPLETED, CANCELED
+    private OrderStatus status; // NOT_YET_SENT, AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED, PAID, USER_CANCELLED, ADMIN_CANCELLED
 
-    @Column(length = 50)
-    private String cancelReason;
+    @Enumerated(EnumType.STRING)
+    private CancelReason cancelReason;
+
+    private String soldOutMenu;
 
     private LocalDateTime expectedPrepTime;
 
