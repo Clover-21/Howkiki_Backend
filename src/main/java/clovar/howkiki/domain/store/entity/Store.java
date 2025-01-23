@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-
 @Entity
 @NoArgsConstructor
 @SuperBuilder
@@ -17,15 +16,16 @@ public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "store_id")
     private Long storeId;
 
     @NotNull
-    @Column(length = 50)
+    @Column(name = "store_name", length = 50)
     private String storeName;
 
     @NotNull
+    @Column(name = "store_status")
+    @Enumerated(value = EnumType.STRING)
     private StoreStatus storeStatus;
-
-
 
 }
