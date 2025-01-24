@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Builder
-public class OrderResponseDto {
+public class OrderResponseDto<T> {
 
     private Long orderId;
     private Boolean isTakeOut;
@@ -21,9 +21,9 @@ public class OrderResponseDto {
     private OrderStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-    private List<OrderDetailDto> orderDetail;
+    private List<T> orderDetail;  // 제너릭 타입 도입
 
-    public OrderResponseDto(Long orderId, Boolean isTakeOut, Long tableNumber, Long orderPrice, OrderStatus status, LocalDateTime createdAt, LocalDateTime modifiedAt, List<OrderDetailDto> orderDetail) {
+    public OrderResponseDto(Long orderId, Boolean isTakeOut, Long tableNumber, Long orderPrice, OrderStatus status, LocalDateTime createdAt, LocalDateTime modifiedAt, List<T> orderDetail) {
         this.orderId = orderId;
         this.isTakeOut = isTakeOut;
         this.tableNumber = tableNumber;
@@ -34,8 +34,8 @@ public class OrderResponseDto {
         this.orderDetail = orderDetail;
     }
 
-    public static OrderResponseDto from (Order order, List<OrderDetailDto> orderDetail){
-        return new OrderResponseDto(
+    public static <T> OrderResponseDto<T> from (Order order, List<T> orderDetail){
+        return new OrderResponseDto<T>(
                 order.getOrderId(),
                 order.getIsTakeOut(),
                 order.getTableNumber(),

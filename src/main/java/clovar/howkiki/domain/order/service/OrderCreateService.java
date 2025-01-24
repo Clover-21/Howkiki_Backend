@@ -26,7 +26,7 @@ import static clovar.howkiki.global.exception.ErrorCode.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderCreateService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
@@ -34,7 +34,7 @@ public class OrderService {
     private final StoreRepository storeRepository;
 
     /* 주문 생성 */
-    public OrderResponseDto createNewOrder(Long storeId, OrderCreateRequestDto requestDto) {
+    public OrderResponseDto<OrderDetailDto> createNewOrder(Long storeId, OrderCreateRequestDto requestDto) {
 
         // 주문 요청 검증
         validateOrderRequest(requestDto, storeId);
