@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@Builder
 public class OrderDetailDto {
     private Long menuId;
     private String menuCategory;

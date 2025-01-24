@@ -24,7 +24,7 @@ public class Order extends BaseEntity {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "storeId", nullable = false)
+    @JoinColumn(name = "store_id", nullable = false)  //DB의 테이블 속성명으로 적기 (자바객체속성명X)
     private Store store;
 
 //    @NotNull

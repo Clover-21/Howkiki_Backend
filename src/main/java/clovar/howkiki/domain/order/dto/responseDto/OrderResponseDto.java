@@ -1,6 +1,5 @@
 package clovar.howkiki.domain.order.dto.responseDto;
 
-
 import clovar.howkiki.domain.order.entity.Order;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import lombok.*;
@@ -8,10 +7,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// 주문 생성, 주문 상세 조회시 응답dto
+// 주문 생성, 목록 전체 조회, 상세 조회시 응답dto
 @Getter
 @NoArgsConstructor
-@Builder
 public class OrderResponseDto<T> {
 
     private Long orderId;
@@ -34,6 +32,7 @@ public class OrderResponseDto<T> {
         this.orderDetail = orderDetail;
     }
 
+    // DTO 변환 from 메서드
     public static <T> OrderResponseDto<T> from (Order order, List<T> orderDetail){
         return new OrderResponseDto<T>(
                 order.getOrderId(),
