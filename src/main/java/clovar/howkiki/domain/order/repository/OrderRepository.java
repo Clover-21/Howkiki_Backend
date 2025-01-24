@@ -14,8 +14,27 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 
     // 해당 가게의 포장 주문 조회 (AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 상태 인것만 + orderID의 역순 정렬
-    @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId AND o.isTakeOut = true " +
+    @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId " +
+            "AND o.isTakeOut = true " +
             "AND o.status IN ('AWAITING_ACCEPTANCE', 'IN_PROGRESS', 'COMPLETED')" +
             "ORDER BY o.orderId DESC")
     List<Order> findTakeOutOrderByStoreId(Long storeId);
+
+
+    // 해당 가게의 테이블 주문 조회
+    // 전송 전, 결제 완료된 주문 제외
+    // 같은 테이블 번호의 주문이 여러개 있다면 가장 최근걸로 하나만 조회
+    // 테이블 번호 오름차순으로 정렬
+    @Query("SELECT o FROM Order o " + "WHERE o.store.storeId = :storeId " +
+            "AND o.isTakeOut = false " +
+            "AND o.status NOT IN ('NOT_YET_SENT', 'PAID') " +
+            "AND o.orderId IN ( " +
+            "  SELECT MAX(subO.orderId) FROM Order subO " +
+            "  WHERE subO.store.storeId = :storeId " +
+            "  AND subO.isTakeOut = false " +
+            "  AND subO.status NOT IN ('NOT_YET_SENT', 'PAID') " +
+            "  GROUP BY subO.tableNumber" +
+            ") " +
+            "ORDER BY o.tableNumber ASC")
+    List<Order> findTableOrderByStoreId(Long storeId);
 }

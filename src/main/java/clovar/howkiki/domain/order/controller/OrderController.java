@@ -61,6 +61,19 @@ public class OrderController {
         return response;
     }
 
+    /* 테이블 주문 전체 조회 */
+    @GetMapping("/tables/all")
+    public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getTableOrder(@PathVariable(name = "storeId") Long storeId){
+
+        List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTableOrder(storeId);
+        ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "포장 주문 목록 전체 조회 성공",
+                responseDto
+        );
+        return response;
+    }
+
 
 
 
