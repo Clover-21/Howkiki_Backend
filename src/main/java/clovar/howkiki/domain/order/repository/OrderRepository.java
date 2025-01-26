@@ -1,6 +1,7 @@
 package clovar.howkiki.domain.order.repository;
 
 import clovar.howkiki.domain.order.entity.Order;
+import clovar.howkiki.domain.order.entity.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,14 +13,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId ")
     List<Order> findByStoreId(Long storeId);
 
-
     // 해당 가게의 포장 주문 조회 (AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 상태 인것만 + orderID의 역순 정렬
     @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId " +
             "AND o.isTakeOut = true " +
             "AND o.status IN ('AWAITING_ACCEPTANCE', 'IN_PROGRESS', 'COMPLETED')" +
             "ORDER BY o.orderId DESC")
     List<Order> findTakeOutOrderByStoreId(Long storeId);
-
 
     // 해당 가게의 테이블 주문 조회
     // 전송 전, 결제 완료된 주문 제외
@@ -37,4 +36,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             ") " +
             "ORDER BY o.tableNumber ASC")
     List<Order> findTableOrderByStoreId(Long storeId);
+
+    // 해당 가게의 특정 상태의 주문 조회 (AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 상태 인것만 + orderID의 역순 정렬
+    @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId " +
+            "AND o.status = :status " +
+            "ORDER BY o.orderId DESC")
+    List<Order> findOrderByStoreIdAndStatus(Long storeId, OrderStatus status);
+
 }

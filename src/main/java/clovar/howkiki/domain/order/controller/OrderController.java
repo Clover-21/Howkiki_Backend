@@ -4,6 +4,7 @@ import clovar.howkiki.domain.order.dto.requestDto.OrderCreateRequestDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderDetailBriefDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderDetailDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderResponseDto;
+import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.service.OrderCreateService;
 import clovar.howkiki.domain.order.service.OrderQueryService;
 import clovar.howkiki.global.response.ApiResponse;
@@ -36,7 +37,7 @@ public class OrderController {
     }
 
     /* 주문 목록 전체 조회 */
-    @GetMapping
+    @GetMapping("/all")
     public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getOrderList(@PathVariable(name = "storeId") Long storeId){
 
         List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getOrderList(storeId);
@@ -68,12 +69,24 @@ public class OrderController {
         List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTableOrder(storeId);
         ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
-                "포장 주문 목록 전체 조회 성공",
+                "테이블 주문 목록 전체 조회 성공",
                 responseDto
         );
         return response;
     }
 
+    /* 특정 상태의 주문 조회 */
+    @GetMapping()
+    public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getOrderByStatus(@PathVariable(name = "storeId") Long storeId,
+                                                                                     @RequestParam OrderStatus status){
+        List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getOrderByStatus(storeId, status);
+        ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "특정 주문 상태의 주문 목록 조회 성공",
+                responseDto
+        );
+        return response;
+    }
 
 
 
