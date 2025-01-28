@@ -107,6 +107,21 @@ public class OrderQueryService {
 
 
 
+    /* 주문 상세 조회 */
+    public OrderResponseDto<OrderDetailDto> getOrderDetail(Long storeId, Long orderId) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/" +orderId;
+        findStore(storeId, methodUrl);
+
+        Order order = orderRepository.findOrderByOrderId(orderId);
+        List<OrderDetailDto> orderDetail = order.getOrderDetails()
+                .stream()
+                .map(OrderDetailDto::from)
+                .toList();
+
+        return OrderResponseDto.from(order, orderDetail);
+    }
 
 
     // 가게 존재 검증

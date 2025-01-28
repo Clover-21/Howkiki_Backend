@@ -50,4 +50,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND o.status IN ('AWAITING_ACCEPTANCE', 'IN_PROGRESS', 'COMPLETED')" +
             "ORDER BY o.orderId DESC")
     List<Order> findOrderByTableNumber(Long storeId, Long tableNumber);
+
+    Order findOrderByOrderId(Long orderId);
 }

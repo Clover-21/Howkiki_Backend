@@ -102,7 +102,18 @@ public class OrderController {
         return response;
     }
 
-
+    /* 주문 상세 조회 */
+    @GetMapping("/{orderId}")
+    public ApiResponse<OrderResponseDto<OrderDetailDto>> getOrderDetail(@PathVariable(name = "storeId") Long storeId,
+                                                                        @PathVariable(name = "orderId") Long orderId){
+        OrderResponseDto<OrderDetailDto> responseDto = orderQueryService.getOrderDetail(storeId, orderId);
+        ApiResponse<OrderResponseDto<OrderDetailDto>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "주문 상세 조회 성공",
+                responseDto
+        );
+        return response;
+    }
 
 
 }
