@@ -4,6 +4,7 @@ import clovar.howkiki.domain.order.dto.requestDto.OrderCreateRequestDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderDetailBriefDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderDetailDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderResponseDto;
+import clovar.howkiki.domain.order.dto.responseDto.TableOrderResponseDto;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.service.OrderCreateService;
 import clovar.howkiki.domain.order.service.OrderQueryService;
@@ -64,9 +65,9 @@ public class OrderController {
 
     /* 테이블 주문 전체 조회 */
     @GetMapping("/tables/all")
-    public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getTableOrder(@PathVariable(name = "storeId") Long storeId){
+    public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getTableOrderList(@PathVariable(name = "storeId") Long storeId){
 
-        List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTableOrder(storeId);
+        List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTableOrderList(storeId);
         ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "테이블 주문 목록 전체 조회 성공",
@@ -83,6 +84,19 @@ public class OrderController {
         ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "특정 주문 상태의 주문 목록 조회 성공",
+                responseDto
+        );
+        return response;
+    }
+
+    /* 해당 테이블 주문 목록 조회 */
+    @GetMapping("/tables/{tableNumber}")
+    public ApiResponse<TableOrderResponseDto> getTableOrder(@PathVariable(name = "storeId") Long storeId,
+                                                            @PathVariable(name = "tableNumber") Long tableNumber){
+        TableOrderResponseDto responseDto = orderQueryService.getTableOrder(storeId, tableNumber);
+        ApiResponse<TableOrderResponseDto> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "해당 테이블 주문 목록 조회 성공",
                 responseDto
         );
         return response;

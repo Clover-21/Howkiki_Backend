@@ -43,4 +43,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "ORDER BY o.orderId DESC")
     List<Order> findOrderByStoreIdAndStatus(Long storeId, OrderStatus status);
 
+
+    // 해당 테이블의 주문 목록 조회 (상태가 AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 인 것 만)
+    @Query("SELECT o From Order o WHERE o.store.storeId = :storeId " +
+            "AND o.tableNumber = :tableNumber " +
+            "AND o.status IN ('AWAITING_ACCEPTANCE', 'IN_PROGRESS', 'COMPLETED')" +
+            "ORDER BY o.orderId DESC")
+    List<Order> findOrderByTableNumber(Long storeId, Long tableNumber);
 }
