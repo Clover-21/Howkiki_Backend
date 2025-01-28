@@ -17,9 +17,9 @@
 //    private Long orderPrice;
 //    private OrderStatus status;
 //    private LocalDateTime createdAt;
-//    private List<OrderDetailDto> menuSummary;
+//    private List<FinalOrderDetailDto> menuSummary;
 //
-//    public OrderListDetailResponseDto(Long orderId, Long tableNumber, Long orderPrice, OrderStatus status, LocalDateTime createdAt, List<OrderDetailDto> menuSummary) {
+//    public OrderListDetailResponseDto(Long orderId, Long tableNumber, Long orderPrice, OrderStatus status, LocalDateTime createdAt, List<FinalOrderDetailDto> menuSummary) {
 //        this.orderId = orderId;
 //        this.tableNumber = tableNumber;
 //        this.orderPrice = orderPrice;
