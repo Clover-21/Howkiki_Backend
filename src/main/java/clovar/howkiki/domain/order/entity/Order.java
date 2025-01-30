@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static clovar.howkiki.domain.order.entity.OrderStatus.ADMIN_CANCELLED;
+
 @Entity
 @NoArgsConstructor
 @SuperBuilder
@@ -56,4 +58,20 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
 
+    // 주문 수정
+    public void updateStatus(OrderStatus status){
+        this.status = status;
+    }
+
+    // 운영자 취소에 의한 주문 수정
+    public void updateOrderByAdmin(CancelReason cancelReason, String soldOutMenu) {
+        this.cancelReason = cancelReason;
+        this.soldOutMenu = soldOutMenu;
+        this.status = ADMIN_CANCELLED;
+    }
+
+    // 완료 예상시간 등록
+    public void updateExpectedPrepTime(LocalDateTime time){
+        this.expectedPrepTime = time;
+    }
 }

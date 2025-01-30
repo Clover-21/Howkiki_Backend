@@ -2,12 +2,13 @@ package clovar.howkiki.domain.order.dto.responseDto;
 
 import clovar.howkiki.domain.order.entity.Order;
 import clovar.howkiki.domain.order.entity.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-// 주문 생성, 목록 전체 조회, 상세 조회시 응답dto
+// 주문 생성, 목록 전체 조회, 상세 조회, 수정 시 응답dto
 @Getter
 @NoArgsConstructor
 public class OrderResponseDto<T> {
@@ -19,6 +20,8 @@ public class OrderResponseDto<T> {
     private OrderStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)  // orderDetail이 null일 경우 제외
     private List<T> orderDetail;  // 제너릭 타입 도입
 
     public OrderResponseDto(Long orderId, Boolean isTakeOut, Long tableNumber, Long orderPrice, OrderStatus status, LocalDateTime createdAt, LocalDateTime modifiedAt, List<T> orderDetail) {
@@ -33,7 +36,7 @@ public class OrderResponseDto<T> {
     }
 
     // DTO 변환 from 메서드
-    public static <T> OrderResponseDto<T> from (Order order, List<T> orderDetail){
+    public static <T> OrderResponseDto<T> fromWithOrderDetail(Order order, List<T> orderDetail){
         return new OrderResponseDto<T>(
                 order.getOrderId(),
                 order.getIsTakeOut(),
@@ -45,6 +48,22 @@ public class OrderResponseDto<T> {
                 orderDetail
         );
     }
+
+    // 수정시 응답 DTO 변환 메서드
+    public static <T> OrderResponseDto<T> fromWithoutOrderDetail(Order order){
+        return new OrderResponseDto<T>(
+                order.getOrderId(),
+                order.getIsTakeOut(),
+                order.getTableNumber(),
+                order.getOrderPrice(),
+                order.getStatus(),
+                order.getCreatedAt(),
+                order.getModifiedAt(),
+                null  // orderDetail은 null로 설정
+        );
+    }
+
+
 
 
 }
