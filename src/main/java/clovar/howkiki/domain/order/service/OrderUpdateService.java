@@ -76,6 +76,28 @@ public class OrderUpdateService {
         return OrderCancelResponseDto.from(order);
     }
 
+    /* 주문 상태 변경 */
+    public OrderResponseDto<Void> updateOrderStatus(Long storeId, Long orderId, OrderStatus orderStatus) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/" +orderId + "/user";
+        findStore(storeId, methodUrl);
+
+        Order order = orderRepository.findOrderByOrderId(orderId);
+
+        // 검증 - 가게Id가 해당 주문의 가게Id가 맞는지
+        if(!storeId.equals(order.getStore().getStoreId())){
+            throw new CustomException(INVALID_STORE_ID, methodUrl);
+        }
+
+        order.updateStatus(orderStatus);
+
+        // @Transactional로 영속성 컨택스트로 관리되므로 save()메서드 생략 가능
+
+        return OrderResponseDto.fromWithoutOrderDetail(order);
+
+    }
+
     /*-----------------------------------------------------------*/
 
     // 가게 존재 검증

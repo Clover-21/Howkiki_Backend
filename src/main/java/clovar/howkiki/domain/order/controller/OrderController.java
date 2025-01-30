@@ -159,4 +159,19 @@ public class OrderController {
         return response;
     }
 
+    /* 주문 상태 변경 */
+    @PatchMapping("/{orderId}/status")
+    public ApiResponse<OrderResponseDto<Void>> updateOrderStatus(@PathVariable(name = "storeId") Long storeId,
+                                                                 @PathVariable(name = "orderId") Long orderId,
+                                                                 @RequestParam OrderStatus orderStatus){
+        OrderResponseDto<Void> responseDto = orderUpdateService.updateOrderStatus(storeId, orderId, orderStatus);
+        ApiResponse<OrderResponseDto<Void>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "주문 상태 변경 성공",
+                responseDto
+        );
+        return response;
+    }
+
+
 }
