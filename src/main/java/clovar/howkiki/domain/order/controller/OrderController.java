@@ -1,5 +1,6 @@
 package clovar.howkiki.domain.order.controller;
 
+import clovar.howkiki.domain.order.dto.requestDto.OrderCancelRequestDto;
 import clovar.howkiki.domain.order.dto.requestDto.OrderCreateRequestDto;
 import clovar.howkiki.domain.order.dto.responseDto.*;
 import clovar.howkiki.domain.order.entity.OrderStatus;
@@ -139,6 +140,20 @@ public class OrderController {
         ApiResponse<OrderResponseDto<Void>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "주문자의 주문 취소 성공",
+                responseDto
+        );
+        return response;
+    }
+
+    /* 운영자의 주문 쥐소 */
+    @PatchMapping("/{orderId}/admin")
+    public ApiResponse<OrderCancelResponseDto> canceledByAdmin(@PathVariable(name = "storeId") Long storeId,
+                                                              @PathVariable(name = "orderId") Long orderId,
+                                                               @RequestBody OrderCancelRequestDto requestDto){
+        OrderCancelResponseDto responseDto = orderUpdateService.canceledByAdmin(storeId, orderId, requestDto);
+        ApiResponse<OrderCancelResponseDto> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "운영자의 주문 취소 성공",
                 responseDto
         );
         return response;

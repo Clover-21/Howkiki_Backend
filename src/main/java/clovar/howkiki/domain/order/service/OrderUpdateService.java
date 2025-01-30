@@ -1,7 +1,10 @@
 package clovar.howkiki.domain.order.service;
 
+import clovar.howkiki.domain.order.dto.requestDto.OrderCancelRequestDto;
+import clovar.howkiki.domain.order.dto.responseDto.OrderCancelResponseDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderResponseDto;
 import clovar.howkiki.domain.order.entity.Order;
+import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.repository.OrderRepository;
 import clovar.howkiki.domain.store.repository.StoreRepository;
 import clovar.howkiki.global.exception.CustomException;
@@ -46,6 +49,32 @@ public class OrderUpdateService {
         return OrderResponseDto.fromWithoutOrderDetail(order);
     }
 
+    /* 운영자의 주문 취소 */
+    public OrderCancelResponseDto canceledByAdmin(Long storeId, Long orderId, OrderCancelRequestDto requestDto) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/" +orderId + "/admin";
+        findStore(storeId, methodUrl);
+
+        Order order = orderRepository.findOrderByOrderId(orderId);
+
+        // 검증 - 가게Id가 해당 주문의 가게Id가 맞는지
+        if(!storeId.equals(order.getStore().getStoreId())){
+            throw new CustomException(INVALID_STORE_ID, methodUrl);
+        }
+
+        // 검증 - 주문 상태가 AWAITING_ACCEPTANCE 또는 IN_PROGRESS 인지 확인
+        OrderStatus status = order.getStatus();
+        if(!(status.equals(AWAITING_ACCEPTANCE) || status.equals(IN_PROGRESS))){
+            throw new CustomException(ORDER_CANNOT_BE_CANCELLED, methodUrl);
+        }
+
+        order.updateOrderByAdmin(requestDto.getCancelReason(), requestDto.getSoldOutMenu());
+
+        // @Transactional로 영속성 컨택스트로 관리되므로 save()메서드 생략 가능
+
+        return OrderCancelResponseDto.from(order);
+    }
 
     /*-----------------------------------------------------------*/
 

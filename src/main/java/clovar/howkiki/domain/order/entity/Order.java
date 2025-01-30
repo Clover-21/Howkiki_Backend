@@ -62,4 +62,11 @@ public class Order extends BaseEntity {
     public void updateStatus(OrderStatus status){
         this.status = status;
     }
+
+    // 운영자 취소에 의한 주문 수정
+    public void updateOrderByAdmin(CancelReason cancelReason, String soldOutMenu) {
+        this.cancelReason = cancelReason;
+        this.soldOutMenu = soldOutMenu;
+        this.status = ADMIN_CANCELLED;
+    }
 }
