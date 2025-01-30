@@ -5,6 +5,7 @@ import clovar.howkiki.domain.order.dto.responseDto.*;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.service.OrderCreateService;
 import clovar.howkiki.domain.order.service.OrderQueryService;
+import clovar.howkiki.domain.order.service.OrderUpdateService;
 import clovar.howkiki.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ public class OrderController {
 
     private final OrderCreateService orderCreateService;
     private final OrderQueryService orderQueryService;
+    private final OrderUpdateService orderUpdateService;
 
     /* 주문 생성 */
     @PostMapping
@@ -127,5 +129,19 @@ public class OrderController {
         return response;
     }
 
+    /*--------------------------------------------------------*/
+
+    /* 주문자의 주문 쥐소 */
+    @PatchMapping("/{orderId}/user")
+    public ApiResponse<OrderResponseDto<Void>> canceledByUser(@PathVariable(name = "storeId") Long storeId,
+                                                      @PathVariable(name = "orderId") Long orderId){
+        OrderResponseDto<Void> responseDto = orderUpdateService.canceledByUser(storeId, orderId);
+        ApiResponse<OrderResponseDto<Void>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "주문자의 주문 취소 성공",
+                responseDto
+        );
+        return response;
+    }
 
 }

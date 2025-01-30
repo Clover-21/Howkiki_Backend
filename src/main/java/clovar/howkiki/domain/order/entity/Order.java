@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static clovar.howkiki.domain.order.entity.OrderStatus.ADMIN_CANCELLED;
+
 @Entity
 @NoArgsConstructor
 @SuperBuilder
@@ -56,4 +58,8 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
 
+    // 주문 수정
+    public void updateStatus(OrderStatus status){
+        this.status = status;
+    }
 }

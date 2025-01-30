@@ -17,7 +17,9 @@ public enum ErrorCode {
     ORDER_DETAIL_EMPTY(BAD_REQUEST, "주문 항목이 비어있습니다."),
     MENU_NOT_FOUND(NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
     MENU_NOT_FOR_THIS_STORE(BAD_REQUEST, "해당 가게의 메뉴가 아닌 메뉴가 포함되어 있습니다."),
-    INVALID_ORDER_STATUS(BAD_REQUEST, "잘못된 상태 값입니다.");
+    INVALID_ORDER_STATUS(BAD_REQUEST, "잘못된 상태 값입니다."),
+    ORDER_CANNOT_BE_CANCELLED(FORBIDDEN, "취소 할 수 없는 주문 상태입니다."),
+    INVALID_STORE_ID(BAD_REQUEST, "잘못된 가게Id입니다.");
 
     private final HttpStatus status;
     private final String message;

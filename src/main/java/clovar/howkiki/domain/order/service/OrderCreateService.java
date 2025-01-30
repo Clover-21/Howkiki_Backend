@@ -65,7 +65,7 @@ public class OrderCreateService {
         List<OrderDetailDto> savedOrderDetail = createOrderDetail(savedOrder, orderDetails, storeId);
 
         // 응답 dto 생성 및 반환
-        return OrderResponseDto.from(savedOrder, savedOrderDetail);
+        return OrderResponseDto.fromWithOrderDetail(savedOrder, savedOrderDetail);
 
     }
 

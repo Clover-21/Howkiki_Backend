@@ -116,7 +116,7 @@ public class OrderQueryService {
                 .map(OrderDetailDto::from)
                 .toList();
 
-        return OrderResponseDto.from(order, orderDetail);
+        return OrderResponseDto.fromWithOrderDetail(order, orderDetail);
     }
 
 
@@ -152,14 +152,12 @@ public class OrderQueryService {
                     .toList();
 
             // 주문 1개
-            OrderResponseDto<OrderDetailBriefDto> orderResponseDto = OrderResponseDto.from(order, orderDetails);
+            OrderResponseDto<OrderDetailBriefDto> orderResponseDto = OrderResponseDto.fromWithOrderDetail(order, orderDetails);
             // 주문 1개 리스트에 추가
             orderResponseDtos.add(orderResponseDto);
         }
         return orderResponseDtos;
     }
-
-
 
 
 }
