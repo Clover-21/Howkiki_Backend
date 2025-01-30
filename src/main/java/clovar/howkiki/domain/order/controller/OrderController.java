@@ -1,10 +1,7 @@
 package clovar.howkiki.domain.order.controller;
 
 import clovar.howkiki.domain.order.dto.requestDto.OrderCreateRequestDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderDetailBriefDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderDetailDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderResponseDto;
-import clovar.howkiki.domain.order.dto.responseDto.TableOrderResponseDto;
+import clovar.howkiki.domain.order.dto.responseDto.*;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.service.OrderCreateService;
 import clovar.howkiki.domain.order.service.OrderQueryService;
@@ -36,6 +33,8 @@ public class OrderController {
         return response;
 
     }
+
+    /* ------------------------------------------------------------------ */
 
     /* 주문 목록 전체 조회 */
     @GetMapping("/all")
@@ -110,6 +109,19 @@ public class OrderController {
         ApiResponse<OrderResponseDto<OrderDetailDto>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "주문 상세 조회 성공",
+                responseDto
+        );
+        return response;
+    }
+
+    /* 주문 예상 시간 조회 */
+    @GetMapping("/{orderId}/expectedPrepTime")
+    public ApiResponse<OrderExpectedPrepTimeResponseDto> getOrderExpectedPrepTime(@PathVariable(name = "storeId") Long storeId,
+                                                                                  @PathVariable(name = "orderId") Long orderId){
+        OrderExpectedPrepTimeResponseDto responseDto = orderQueryService.getOrderExpectedPrepTime(storeId, orderId);
+        ApiResponse<OrderExpectedPrepTimeResponseDto> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "주문 예상시간 조회 성공",
                 responseDto
         );
         return response;
