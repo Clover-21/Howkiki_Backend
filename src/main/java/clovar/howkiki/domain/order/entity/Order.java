@@ -69,4 +69,9 @@ public class Order extends BaseEntity {
         this.soldOutMenu = soldOutMenu;
         this.status = ADMIN_CANCELLED;
     }
+
+    // 완료 예상시간 등록
+    public void updateExpectedPrepTime(LocalDateTime time){
+        this.expectedPrepTime = time;
+    }
 }

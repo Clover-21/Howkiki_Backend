@@ -1,5 +1,6 @@
 package clovar.howkiki.domain.order.controller;
 
+import clovar.howkiki.domain.order.dto.requestDto.OrderAcceptedRequestDto;
 import clovar.howkiki.domain.order.dto.requestDto.OrderCancelRequestDto;
 import clovar.howkiki.domain.order.dto.requestDto.OrderCreateRequestDto;
 import clovar.howkiki.domain.order.dto.responseDto.*;
@@ -181,6 +182,20 @@ public class OrderController {
         ApiResponse<TableOrderResponseDto<TableOrderDetailBriefDto>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "해당 테이블의 주문 결제 완료로 변경 성공",
+                responseDto
+        );
+        return response;
+    }
+
+    /* 주문 수락 */
+    @PatchMapping("/{orderId}/order-acceptance")
+    public ApiResponse<OrderExpectedPrepTimeResponseDto> acceptOrder(@PathVariable(name = "storeId") Long storeId,
+                                                           @PathVariable(name = "orderId") Long orderId,
+                                                           @RequestBody OrderAcceptedRequestDto requestDto){
+        OrderExpectedPrepTimeResponseDto responseDto = orderUpdateService.acceptOrder(storeId, orderId, requestDto);
+        ApiResponse<OrderExpectedPrepTimeResponseDto> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "주문 수락 성공",
                 responseDto
         );
         return response;
