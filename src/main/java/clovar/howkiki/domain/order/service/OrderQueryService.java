@@ -1,9 +1,6 @@
 package clovar.howkiki.domain.order.service;
 
-import clovar.howkiki.domain.order.dto.responseDto.OrderDetailBriefDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderDetailDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderResponseDto;
-import clovar.howkiki.domain.order.dto.responseDto.TableOrderResponseDto;
+import clovar.howkiki.domain.order.dto.responseDto.*;
 import clovar.howkiki.domain.order.entity.Order;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.repository.OrderRepository;
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static clovar.howkiki.global.exception.ErrorCode.STORE_ID_NOT_FOUND;
@@ -123,6 +119,20 @@ public class OrderQueryService {
         return OrderResponseDto.from(order, orderDetail);
     }
 
+
+    /* 주문 예상 시간 조회 */
+    public OrderExpectedPrepTimeResponseDto getOrderExpectedPrepTime(Long storeId, Long orderId) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/" +orderId;
+        findStore(storeId, methodUrl);
+
+        Order order = orderRepository.findOrderByOrderId(orderId);
+
+        return OrderExpectedPrepTimeResponseDto.from(order);
+    }
+
+    /*-----------------------------------------------------------*/
 
     // 가게 존재 검증
     private void findStore(Long storeId, String methodUrl) {
