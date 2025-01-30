@@ -1,8 +1,7 @@
 package clovar.howkiki.domain.order.service;
 
 import clovar.howkiki.domain.order.dto.requestDto.OrderCancelRequestDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderCancelResponseDto;
-import clovar.howkiki.domain.order.dto.responseDto.OrderResponseDto;
+import clovar.howkiki.domain.order.dto.responseDto.*;
 import clovar.howkiki.domain.order.entity.Order;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import clovar.howkiki.domain.order.repository.OrderRepository;
@@ -11,6 +10,9 @@ import clovar.howkiki.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static clovar.howkiki.domain.order.entity.OrderStatus.*;
 import static clovar.howkiki.global.exception.ErrorCode.*;
@@ -80,7 +82,7 @@ public class OrderUpdateService {
     public OrderResponseDto<Void> updateOrderStatus(Long storeId, Long orderId, OrderStatus orderStatus) {
 
         // 검증 - 해당 가게 찾기
-        String methodUrl = "/stores/"+ storeId +"/orders/" +orderId + "/user";
+        String methodUrl = "/stores/"+ storeId +"/orders/" +orderId + "/status";
         findStore(storeId, methodUrl);
 
         Order order = orderRepository.findOrderByOrderId(orderId);
@@ -98,6 +100,29 @@ public class OrderUpdateService {
 
     }
 
+    /* 해당 테이블 주문 결제 완료 */
+    public TableOrderResponseDto<TableOrderDetailBriefDto> updateTableOrderStatusPaid(Long storeId, Long tableNumber) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/tables/" +tableNumber + "/status-paid";
+        findStore(storeId, methodUrl);
+
+        // 해당 테이블의 주문 조회
+        List<Order> orders = orderRepository.findOrderByTableNumber(storeId, tableNumber);
+
+        // orderList 생성
+        Long totalPrice = 0L;
+        List<TableOrderDetailBriefDto> orderList = new ArrayList<>();
+        for (Order order : orders) {
+            order.updateStatus(PAID);
+            orderList.add(TableOrderDetailBriefDto.from(order));
+            totalPrice += order.getOrderPrice();
+        }
+
+        return TableOrderResponseDto.from(tableNumber, totalPrice, orderList);
+
+    }
+    
     /*-----------------------------------------------------------*/
 
     // 가게 존재 검증

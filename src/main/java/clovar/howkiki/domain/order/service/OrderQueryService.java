@@ -76,7 +76,7 @@ public class OrderQueryService {
 
 
     /* 해당 테이블 주문 목록 조회 */
-    public TableOrderResponseDto getTableOrder(Long storeId, Long tableNumber) {
+    public TableOrderResponseDto<OrderDetailDto> getTableOrder(Long storeId, Long tableNumber) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+ storeId +"/orders/tables/" +tableNumber;
@@ -98,7 +98,7 @@ public class OrderQueryService {
             totalPrice += order.getOrderPrice();
         }
 
-        return new TableOrderResponseDto(tableNumber, totalPrice, orderDetails);
+        return TableOrderResponseDto.from(tableNumber, totalPrice, orderDetails);
     }
 
 

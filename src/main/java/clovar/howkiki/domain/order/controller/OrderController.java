@@ -93,10 +93,10 @@ public class OrderController {
 
     /* 해당 테이블 주문 목록 조회 */
     @GetMapping("/tables/{tableNumber}")
-    public ApiResponse<TableOrderResponseDto> getTableOrder(@PathVariable(name = "storeId") Long storeId,
+    public ApiResponse<TableOrderResponseDto<OrderDetailDto>> getTableOrder(@PathVariable(name = "storeId") Long storeId,
                                                             @PathVariable(name = "tableNumber") Long tableNumber){
-        TableOrderResponseDto responseDto = orderQueryService.getTableOrder(storeId, tableNumber);
-        ApiResponse<TableOrderResponseDto> response = new ApiResponse<>(
+        TableOrderResponseDto<OrderDetailDto> responseDto = orderQueryService.getTableOrder(storeId, tableNumber);
+        ApiResponse<TableOrderResponseDto<OrderDetailDto>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "해당 테이블 주문 목록 조회 성공",
                 responseDto
@@ -173,5 +173,17 @@ public class OrderController {
         return response;
     }
 
+    /* 해당 테이블의 주문 결제 완료  */
+    @PatchMapping("/tables/{tableNumber}/status-paid")
+    public ApiResponse<TableOrderResponseDto<TableOrderDetailBriefDto>> updateTableOrderStatusPaid(@PathVariable(name = "storeId") Long storeId,
+                                                                         @PathVariable(name = "tableNumber") Long tableNumber){
+        TableOrderResponseDto<TableOrderDetailBriefDto> responseDto = orderUpdateService.updateTableOrderStatusPaid(storeId, tableNumber);
+        ApiResponse<TableOrderResponseDto<TableOrderDetailBriefDto>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "해당 테이블의 주문 결제 완료로 변경 성공",
+                responseDto
+        );
+        return response;
+    }
 
 }
