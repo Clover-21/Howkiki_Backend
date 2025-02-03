@@ -1,5 +1,6 @@
 package clovar.howkiki.domain.menu.entity;
 
+import clovar.howkiki.domain.store.entity.Store;
 import clovar.howkiki.global.entity.BaseEntity;
 import clovar.howkiki.domain.order.entity.OrderDetail;
 import jakarta.persistence.*;
@@ -14,32 +15,34 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Getter
+@Table(name = "Menu")
 public class Menu extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "menuCategoryId", nullable = false)
-    private MenuCategory menuCategory;
+    private Long menuId;
 
     @NotNull
-    @Column(length = 100)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "storeId", nullable = false)
+    private Store store;
+
+    @NotNull
+    @Column(length = 50)
+    private String menuName;
 
     @NotNull
     @Column(length = 10)
     private Long cost;
 
-    @Column(length = 500)
-    private String explanation;
+    @Column(length = 50)
+    private String menuCategory;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private MenuStatus status; // AVAILABLE, OUT_OF_STOCK, NOT_AVAILABLE
+    private MenuStatus menuStatus; // AVAILABLE, OUT_OF_STOCK, NOT_AVAILABLE
 
-    @Column(length = 500)
+    @Column(length = 1024)
     private String menuImgUrl;
 
     @OneToMany(mappedBy = "menu")

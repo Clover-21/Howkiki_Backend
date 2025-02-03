@@ -1,5 +1,6 @@
 package clovar.howkiki.domain.order.entity;
 
+import clovar.howkiki.domain.store.entity.Store;
 import clovar.howkiki.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,19 +11,32 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static clovar.howkiki.domain.order.entity.OrderStatus.ADMIN_CANCELLED;
+
 @Entity
 @NoArgsConstructor
 @SuperBuilder
 @Getter
-@Table(name = "orders")
+@Table(name = "Orders")
 public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long orderId;
 
-    private Long storeId;
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "store_id", nullable = false)  //DB의 테이블 속성명으로 적기 (자바객체속성명X)
+    private Store store;
 
+//    @NotNull
+    @Column(length = 255)
+    private String sessionToken;
+
+    @NotNull
+    private Boolean isTakeOut;
+
+    @NotNull
     @Column(length = 10)
     private Long tableNumber;
 
@@ -32,14 +46,32 @@ public class Order extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private OrderStatus status; // PENDING, PROCESSING, COMPLETED, CANCELED
+    private OrderStatus status; // NOT_YET_SENT, AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED, PAID, USER_CANCELLED, ADMIN_CANCELLED
 
-    @Column(length = 50)
-    private String cancelReason;
+    @Enumerated(EnumType.STRING)
+    private CancelReason cancelReason;
+
+    private String soldOutMenu;
 
     private LocalDateTime expectedPrepTime;
 
     @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
 
+    // 주문 수정
+    public void updateStatus(OrderStatus status){
+        this.status = status;
+    }
+
+    // 운영자 취소에 의한 주문 수정
+    public void updateOrderByAdmin(CancelReason cancelReason, String soldOutMenu) {
+        this.cancelReason = cancelReason;
+        this.soldOutMenu = soldOutMenu;
+        this.status = ADMIN_CANCELLED;
+    }
+
+    // 완료 예상시간 등록
+    public void updateExpectedPrepTime(LocalDateTime time){
+        this.expectedPrepTime = time;
+    }
 }

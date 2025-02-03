@@ -7,34 +7,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-
 @Entity
 @NoArgsConstructor
 @SuperBuilder
 @Getter
+@Table(name = "Stores")
 public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "store_id")
+    private Long storeId;
 
     @NotNull
-    @Column(length = 50)
+    @Column(name = "store_name", length = 50)
     private String storeName;
 
     @NotNull
-    private String address;
-
-    @NotNull
-    @Column(length = 500)
-    private String operatingHours;
-
-    @NotNull
-    @Column(length = 20)
-    private String phoneNumber;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private StoreCategory storeCategory; // ITALIAN, JAPANESE, etc.
+    @Column(name = "store_status")
+    @Enumerated(value = EnumType.STRING)
+    private StoreStatus storeStatus;
 
 }
