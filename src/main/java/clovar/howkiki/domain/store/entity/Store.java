@@ -24,6 +24,10 @@ public class Store extends BaseEntity {
     private String storeName;
 
     @NotNull
+    @Column(name = "sessionToken", length = 255)
+    private String sessionToken;
+
+    @NotNull
     @Column(name = "store_status")
     @Enumerated(value = EnumType.STRING)
     private StoreStatus storeStatus;
