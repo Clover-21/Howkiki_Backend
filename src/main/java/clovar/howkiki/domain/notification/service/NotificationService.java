@@ -1,14 +1,18 @@
 package clovar.howkiki.domain.notification.service;
 
 import clovar.howkiki.domain.notification.dto.NewOrderNoticeResponseDto;
+import clovar.howkiki.domain.notification.dto.NewRequestDto;
+import clovar.howkiki.domain.notification.dto.NewRequestResponseDto;
 import clovar.howkiki.domain.notification.dto.OrderCanceledResponseDto;
 import clovar.howkiki.domain.order.entity.Order;
+import clovar.howkiki.domain.order.repository.OrderRepository;
 import clovar.howkiki.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static clovar.howkiki.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static clovar.howkiki.global.exception.ErrorCode.SESSION_TOKEN_EMPTY;
 
 @Service
@@ -17,7 +21,8 @@ import static clovar.howkiki.global.exception.ErrorCode.SESSION_TOKEN_EMPTY;
 @Slf4j
 public class NotificationService {
 
-    private final SseService sseService;  //sse 관련 서비스 로직
+    private final SseService sseService;  // sse 관련 서비스 로직
+    private final OrderRepository orderRepository;
 
     /* 새로운 주문 도착 알림 전송 */
     public void sendNewOrderNotice(Order order, String storeSessionToken) {
@@ -50,6 +55,29 @@ public class NotificationService {
         sseService.sendNotification(userSessionToken, responseDto);
 
     }
+
+    /* 요청 사항 알림 */
+    public NewRequestResponseDto sendNewRequestNotice(String userSessionToken, NewRequestDto requestDto){
+
+        checkSessionToken(userSessionToken);
+
+        // 요청자의 가장 최근 order 조회
+        Order userOrder = orderRepository.findRecentOrderBySessionToken(userSessionToken);
+        // 검증
+        if(userOrder == null){
+            throw new CustomException(ORDER_NOT_FOUND, "/notification/new-request");
+        }
+
+        String storeSessionToken = userOrder.getStore().getSessionToken();
+
+        // dto 생성
+        NewRequestResponseDto responseDto = NewRequestResponseDto.from(userOrder, requestDto);
+
+        // 알림 전송
+        sseService.sendNotification(storeSessionToken, responseDto);
+        return responseDto;
+    }
+
 
     // 세션 토큰 유무 검증
     private void checkSessionToken(String sessionToken){

@@ -53,4 +53,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findOrderByTableNumber(@Param("storeId")Long storeId, @Param("tableNumber")Long tableNumber);
 
     Order findOrderByOrderId(@Param("orderId")Long orderId);
+
+    // 해당 세션 토큰의 가장 최근 order 조회
+    @Query(value = "SELECT * FROM `orders` o WHERE o.session_token = :userSessionToken ORDER BY o.order_id DESC LIMIT 1", nativeQuery = true)
+    Order findRecentOrderBySessionToken(@Param("userSessionToken") String userSessionToken);
+
 }
