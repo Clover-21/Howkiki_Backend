@@ -1,6 +1,7 @@
 package clovar.howkiki.domain.notification.service;
 
 import clovar.howkiki.domain.notification.dto.NewOrderNoticeResponseDto;
+import clovar.howkiki.domain.notification.dto.OrderCanceledResponseDto;
 import clovar.howkiki.domain.order.entity.Order;
 import clovar.howkiki.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,30 @@ public class NotificationService {
 
     }
 
+    /* 운영자의 주문 취소 알림 */
+    public void sendOrderCanceledByAdmin(Order order, String userSessionToken) {
+
+        checkSessionToken(userSessionToken);
+
+        String explanation = switch (order.getCancelReason()) {
+            case OUT_OF_STOCK -> order.getSoldOutMenu() + " - 재료소진";
+            case LAST_ORDER_ENDED -> "라스트 오더 종료";
+            default -> "가게 기타 사정";
+        };
+
+        // 주문 취소 알림 dto 생성
+        OrderCanceledResponseDto responseDto = OrderCanceledResponseDto.from(order, explanation);
+
+        // 알림전송
+        sseService.sendNotification(userSessionToken, responseDto);
+
+    }
+
     // 세션 토큰 유무 검증
     private void checkSessionToken(String sessionToken){
         if (sessionToken == null){
             throw new CustomException(SESSION_TOKEN_EMPTY, "null");
         }
     }
+
 }
