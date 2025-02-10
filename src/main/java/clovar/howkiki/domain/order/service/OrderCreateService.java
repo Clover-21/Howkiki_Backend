@@ -2,6 +2,7 @@ package clovar.howkiki.domain.order.service;
 
 import clovar.howkiki.domain.menu.entity.Menu;
 import clovar.howkiki.domain.menu.repository.MenuRepository;
+import clovar.howkiki.domain.notification.service.NotificationService;
 import clovar.howkiki.domain.order.dto.requestDto.FinalOrderDetailDto;
 import clovar.howkiki.domain.order.dto.requestDto.OrderCreateRequestDto;
 import clovar.howkiki.domain.order.dto.responseDto.OrderDetailDto;
@@ -25,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static clovar.howkiki.domain.order.entity.OrderStatus.USER_CANCELLED;
 import static clovar.howkiki.global.exception.ErrorCode.*;
 
 @Service
@@ -37,9 +39,10 @@ public class OrderCreateService {
     private final OrderDetailRepository orderDetailRepository;
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final NotificationService notificationService;
 
     /* 주문 생성 */
-    public OrderResponseDto<OrderDetailDto> createNewOrder(Long storeId, OrderCreateRequestDto requestDto) {
+    public OrderResponseDto<OrderDetailDto> createNewOrder(Long storeId, String sessionToken, OrderCreateRequestDto requestDto) {
 
         // 주문 요청 검증
         validateOrderRequest(requestDto, storeId);
@@ -58,7 +61,7 @@ public class OrderCreateService {
         // Order 객체 생성
         Order order = Order.builder()
                 .store(store)
-                .sessionToken("1")  // 추후 수정
+                .sessionToken(sessionToken)  // 추후 수정
                 .isTakeOut(requestDto.getIsTakeOut())
                 .tableNumber(requestDto.getTableNumber())
                 .orderPrice(orderPrice)
@@ -70,8 +73,11 @@ public class OrderCreateService {
         // *Order Detail 객체 생성
         List<OrderDetailDto> savedOrderDetail = createOrderDetail(savedOrder, orderDetails, storeId);
 
-        // 스케줄러 호출 - 상태 AWAITING_ACCEPTANCE로 변경
+        // 스케줄러 호출 - 30초 후 상태 AWAITING_ACCEPTANCE로 변경
         scheduleOrderStatusUpdate(order, methodUrl);
+
+        // 스케줄러 호출 - 새로운 주문 도착 알림 발송
+        scheduleNewOrderNotice(order, methodUrl);
 
         // 응답 dto 생성 및 반환
         return OrderResponseDto.fromWithOrderDetail(savedOrder, savedOrderDetail);
@@ -125,6 +131,9 @@ public class OrderCreateService {
 
     // 메서드 호출 후 30초 후 상태변경
     public void scheduleOrderStatusUpdate(Order order, String methodUrl) {
+        // 상태가 유저 켄슬드인지 확인
+        if(order.getStatus().equals(USER_CANCELLED)){ return; }
+
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // 스레드 풀 1개 생성
 
         // 30초 후 상태 변경 작업 실행
@@ -135,6 +144,26 @@ public class OrderCreateService {
                 log.info("orderId: " + order.getOrderId() + " - 상태가 AWAITING_ACCEPTANCE로 변경되었습니다.");
             } catch (Exception e){
                 throw new CustomException(FAILED_TO_SCHEDULE_ORDER_STATUS, methodUrl);
+            } finally {
+                scheduler.shutdown();  // 작업 완료 후 스레드 풀 종료 - 자원 낭비 방지!
+            }
+        }, 30, TimeUnit.SECONDS);
+    }
+
+    // 메서드 호출 후 30초 후 알림 전송
+    public void scheduleNewOrderNotice(Order order, String methodUrl) {
+        // 상태가 유저 켄슬드인지 확인
+        if(order.getStatus().equals(USER_CANCELLED)){ return; }
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // 스레드 풀 1개 생성
+
+        // 30초 후 상태 변경 작업 실행
+        scheduler.schedule(() -> {
+            try {
+                notificationService.sendNewOrderNotice(order, order.getStore().getSessionToken());
+                log.info("orderId: " + order.getOrderId() + " - 새로운 주문 도착 알림이 전송되었습니다.");
+            } catch (Exception e){
+                throw new CustomException(FAILED_TO_SCHEDULE_NEW_ORDER_NOTICE, methodUrl);
             } finally {
                 scheduler.shutdown();  // 작업 완료 후 스레드 풀 종료 - 자원 낭비 방지!
             }

@@ -4,6 +4,7 @@ import clovar.howkiki.domain.order.entity.Order;
 import clovar.howkiki.domain.order.entity.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -11,14 +12,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // 해당 가게의 모든 주문 조회
     @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId ")
-    List<Order> findByStoreId(Long storeId);
+    List<Order> findByStoreId(@Param("storeId") Long storeId);
 
     // 해당 가게의 포장 주문 조회 (AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 상태 인것만 + orderID의 역순 정렬
     @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId " +
             "AND o.isTakeOut = true " +
             "AND o.status IN ('AWAITING_ACCEPTANCE', 'IN_PROGRESS', 'COMPLETED')" +
             "ORDER BY o.orderId DESC")
-    List<Order> findTakeOutOrderByStoreId(Long storeId);
+    List<Order> findTakeOutOrderByStoreId(@Param("storeId") Long storeId);
 
     // 해당 가게의 테이블 주문 조회
     // 전송 전, 결제 완료된 주문 제외
@@ -35,13 +36,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "  GROUP BY subO.tableNumber" +
             ") " +
             "ORDER BY o.tableNumber ASC")
-    List<Order> findTableOrderByStoreId(Long storeId);
+    List<Order> findTableOrderByStoreId(@Param("storeId")Long storeId);
 
     // 해당 가게의 특정 상태의 주문 조회 (AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 상태 인것만 + orderID의 역순 정렬
     @Query("SELECT o FROM Order o WHERE o.store.storeId = :storeId " +
             "AND o.status = :status " +
             "ORDER BY o.orderId DESC")
-    List<Order> findOrderByStoreIdAndStatus(Long storeId, OrderStatus status);
+    List<Order> findOrderByStoreIdAndStatus(@Param("storeId")Long storeId, @Param("status")OrderStatus status);
 
 
     // 해당 테이블의 주문 목록 조회 (상태가 AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED 인 것 만)
@@ -49,7 +50,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND o.tableNumber = :tableNumber " +
             "AND o.status IN ('AWAITING_ACCEPTANCE', 'IN_PROGRESS', 'COMPLETED')" +
             "ORDER BY o.orderId DESC")
-    List<Order> findOrderByTableNumber(Long storeId, Long tableNumber);
+    List<Order> findOrderByTableNumber(@Param("storeId")Long storeId, @Param("tableNumber")Long tableNumber);
 
-    Order findOrderByOrderId(Long orderId);
+    Order findOrderByOrderId(@Param("orderId")Long orderId);
+
+    // 해당 세션 토큰의 가장 최근 order 조회
+    @Query(value = "SELECT * FROM `orders` o WHERE o.session_token = :userSessionToken ORDER BY o.order_id DESC LIMIT 1", nativeQuery = true)
+    Order findRecentOrderBySessionToken(@Param("userSessionToken") String userSessionToken);
+
 }

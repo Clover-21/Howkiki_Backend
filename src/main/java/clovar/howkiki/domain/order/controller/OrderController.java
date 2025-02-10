@@ -26,9 +26,10 @@ public class OrderController {
 
     /* 주문 생성 */
     @PostMapping
-    public ApiResponse<OrderResponseDto<OrderDetailDto>> createOrder(@PathVariable(name = "storeId") Long storeId,
+    public ApiResponse<OrderResponseDto<OrderDetailDto>> createOrder(@RequestHeader(name = "sessionToken")String sessionToken,
+                                                                     @PathVariable(name = "storeId") Long storeId,
                                                                      @RequestBody OrderCreateRequestDto requestDto){
-        OrderResponseDto<OrderDetailDto> responseDto = orderCreateService.createNewOrder(storeId, requestDto);
+        OrderResponseDto<OrderDetailDto> responseDto = orderCreateService.createNewOrder(storeId, sessionToken, requestDto);
         ApiResponse<OrderResponseDto<OrderDetailDto>> response = new ApiResponse<>(
                 HttpStatus.CREATED.value(),
                 "주문 생성 성공",
