@@ -1,5 +1,6 @@
 package clovar.howkiki.domain.order.service;
 
+import clovar.howkiki.domain.notification.service.NotificationService;
 import clovar.howkiki.domain.order.dto.requestDto.OrderAcceptedRequestDto;
 import clovar.howkiki.domain.order.dto.requestDto.OrderCancelRequestDto;
 import clovar.howkiki.domain.order.dto.responseDto.*;
@@ -26,6 +27,7 @@ public class OrderUpdateService {
 
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
+    private final NotificationService notificationService;
 
     /* 주문자의 주문 취소 */
     public OrderResponseDto<Void> canceledByUser(Long storeId, Long orderId) {
@@ -72,6 +74,10 @@ public class OrderUpdateService {
         order.updateOrderByAdmin(requestDto.getCancelReason(), requestDto.getSoldOutMenu());
 
         // @Transactional로 영속성 컨택스트로 관리되므로 save()메서드 생략 가능
+
+        // 주문 취소 알림
+        String userSessionToken = order.getSessionToken();
+        notificationService.sendOrderCanceledByAdmin(order, userSessionToken);
 
         return OrderCancelResponseDto.from(order);
     }
