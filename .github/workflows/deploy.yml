@@ -49,7 +49,8 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew build -x test
+          ./gradlew clean  # 기존의 빌드 파일 삭제
+          ./gradlew build -x test  # 새로운 빌드 생성
 
       # GitHub Secrets에 추가한 액세스 키 값으로 AWS 사용자 인증
       - name: Configure AWS credentials
