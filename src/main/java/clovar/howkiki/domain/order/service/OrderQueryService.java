@@ -15,9 +15,9 @@ import java.util.List;
 
 import static clovar.howkiki.global.exception.ErrorCode.STORE_ID_NOT_FOUND;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderQueryService {
 
     private final OrderRepository orderRepository;

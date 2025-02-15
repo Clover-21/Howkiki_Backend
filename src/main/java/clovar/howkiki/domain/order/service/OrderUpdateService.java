@@ -20,7 +20,7 @@ import java.util.List;
 import static clovar.howkiki.domain.order.entity.OrderStatus.*;
 import static clovar.howkiki.global.exception.ErrorCode.*;
 
-@Transactional
+@Transactional // 모든 작업이 DB 쓰기 연산을 포함하므로 클래스 단위에 적용
 @Service
 @RequiredArgsConstructor
 public class OrderUpdateService {

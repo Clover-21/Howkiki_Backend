@@ -14,7 +14,7 @@ import static clovar.howkiki.global.exception.ErrorCode.STORE_NOT_FOUND;
 
 @Service
 @Getter
-@Transactional
+@Transactional(readOnly = true)
 public class StoreService {
 
     private final StoreRepository storeRepository;

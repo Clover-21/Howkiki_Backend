@@ -17,7 +17,6 @@ import static clovar.howkiki.global.exception.ErrorCode.SESSION_TOKEN_EMPTY;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class NotificationService {
 
@@ -57,6 +56,7 @@ public class NotificationService {
     }
 
     /* 요청 사항 알림 */
+    @Transactional(readOnly = true)  // 주문 조회를 위해 트랜잭션 필요
     public NewRequestResponseDto sendNewRequestNotice(String userSessionToken, NewRequestDto requestDto){
 
         checkSessionToken(userSessionToken);
