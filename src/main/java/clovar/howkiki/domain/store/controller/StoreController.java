@@ -15,13 +15,13 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    /* 가게명으로 가게ID 조회 */
+    /* 가게명으로 가게 정보 조회 */
     @GetMapping
     public ApiResponse<StoreIdResponseDto> getStoreId(@RequestBody StoreIdRequestDto requestDto) {
         StoreIdResponseDto responseDto = storeService.getStoreId(requestDto);
         return new ApiResponse<StoreIdResponseDto>(
                 HttpStatus.OK.value(),
-                "가게 id 조회 성공",
+                "가게 정보 조회 성공",
                 responseDto
         );
     }
