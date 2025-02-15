@@ -11,16 +11,19 @@ import lombok.NoArgsConstructor;
 public class StoreIdResponseDto {
     private Long storeId;
     private String storeName;
+    private String sessionToken;
 
-    public StoreIdResponseDto(Long storeId, String storeName) {
+    public StoreIdResponseDto(Long storeId, String storeName, String sessionToken) {
         this.storeId = storeId;
         this.storeName = storeName;
+        this.sessionToken = sessionToken;
     }
 
     public static StoreIdResponseDto from (Store store){
         return new StoreIdResponseDto(
                 store.getStoreId(),
-                store.getStoreName()
+                store.getStoreName(),
+                store.getSessionToken()
         );
     }
 
