@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROJECT_ROOT="/home/ubuntu/howkiki"
-JAR_FILE="$PROJECT_ROOT/ShareEat-webapp.jar"
+JAR_FILE="$PROJECT_ROOT/howkiki-webapp.jar"
 
 DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
 
