@@ -30,7 +30,6 @@ import static clovar.howkiki.domain.order.entity.OrderStatus.USER_CANCELLED;
 import static clovar.howkiki.global.exception.ErrorCode.*;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class OrderCreateService {
@@ -42,6 +41,7 @@ public class OrderCreateService {
     private final NotificationService notificationService;
 
     /* 주문 생성 */
+    @Transactional
     public OrderResponseDto<OrderDetailDto> createNewOrder(Long storeId, String sessionToken, OrderCreateRequestDto requestDto) {
 
         // 주문 요청 검증
@@ -92,6 +92,7 @@ public class OrderCreateService {
     }
 
     // 주문 총액 계산 메서드
+    @Transactional(readOnly = true)
     private Long calculateOrderPrice(List<FinalOrderDetailDto> orderList, Long storeId) {
         return orderList.stream()
                 .mapToLong(detail -> {
@@ -103,6 +104,7 @@ public class OrderCreateService {
     }
 
     // 주문 상세 생성 메서드
+    @Transactional
     private List<OrderDetailDto> createOrderDetail(Order order, List<FinalOrderDetailDto> orderList, Long storeId) {
         List<OrderDetailDto> result = new ArrayList<>();  // 변환된 DTO를 저장할 리스트
 
