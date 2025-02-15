@@ -36,7 +36,7 @@ public class OrderQueryService {
     }
 
     /* 포장 주문 전체 조회 */
-    public List<OrderResponseDto<OrderDetailBriefDto>> getTakeOutOrder(Long storeId) {
+    public List<OrderResponseDto<TakeOutOrderDetailBriefDto>> getTakeOutOrder(Long storeId) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+storeId+"/orders/take-out";
@@ -45,7 +45,7 @@ public class OrderQueryService {
         // 해당 가게의 포장 주문 조회
         List<Order> orders = orderRepository.findTakeOutOrderByStoreId(storeId);
 
-        return getOrderResponseDtos(orders);
+        return getTakeOutOrderResponseDtos(orders);
     }
 
     /* 테이블 주문 전체 조회 */
@@ -153,6 +153,25 @@ public class OrderQueryService {
 
             // 주문 1개
             OrderResponseDto<OrderDetailBriefDto> orderResponseDto = OrderResponseDto.fromWithOrderDetail(order, orderDetails);
+            // 주문 1개 리스트에 추가
+            orderResponseDtos.add(orderResponseDto);
+        }
+        return orderResponseDtos;
+    }
+
+    // 포장 주문 목록 dto 반환
+    private static List<OrderResponseDto<TakeOutOrderDetailBriefDto>> getTakeOutOrderResponseDtos(List<Order> orders) {
+        List<OrderResponseDto<TakeOutOrderDetailBriefDto>> orderResponseDtos = new ArrayList<>();  // 주문 목록 리스트
+
+        // 각 주문에 대한 orderDetail 가져와서 orderDetailBriefDto 형식인 orderDetail 생성한 후, 리스트화
+        for (Order order : orders) {
+            // orderDetails 생성
+            List<TakeOutOrderDetailBriefDto> orderDetails = order.getOrderDetails().stream()
+                    .map(TakeOutOrderDetailBriefDto::from)
+                    .toList();
+
+            // 주문 1개
+            OrderResponseDto<TakeOutOrderDetailBriefDto> orderResponseDto = OrderResponseDto.fromWithOrderDetail(order, orderDetails);
             // 주문 1개 리스트에 추가
             orderResponseDtos.add(orderResponseDto);
         }

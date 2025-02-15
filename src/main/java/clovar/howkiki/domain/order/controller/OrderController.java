@@ -56,10 +56,10 @@ public class OrderController {
 
     /* 포장 주문 전체 조회 */
     @GetMapping("/take-out")
-    public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getTakeOutOrder(@PathVariable(name = "storeId") Long storeId){
+    public ApiResponse<List<OrderResponseDto<TakeOutOrderDetailBriefDto>>> getTakeOutOrder(@PathVariable(name = "storeId") Long storeId){
 
-        List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTakeOutOrder(storeId);
-        ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
+        List<OrderResponseDto<TakeOutOrderDetailBriefDto>> responseDto = orderQueryService.getTakeOutOrder(storeId);
+        ApiResponse<List<OrderResponseDto<TakeOutOrderDetailBriefDto>>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "포장 주문 목록 전체 조회 성공",
                 responseDto
