@@ -83,7 +83,7 @@ public class OrderController {
     /* 특정 상태의 주문 조회 */
     @GetMapping()
     public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getOrderByStatus(@PathVariable(name = "storeId") Long storeId,
-                                                                                     @RequestParam OrderStatus status){
+                                                                                     @RequestParam(name = "status") OrderStatus status){
         List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getOrderByStatus(storeId, status);
         ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -96,7 +96,7 @@ public class OrderController {
     /* 해당 테이블 주문 목록 조회 */
     @GetMapping("/tables/{tableNumber}")
     public ApiResponse<TableOrderResponseDto<OrderDetailDto>> getTableOrder(@PathVariable(name = "storeId") Long storeId,
-                                                            @PathVariable(name = "tableNumber") Long tableNumber){
+                                                                            @PathVariable(name = "tableNumber") Long tableNumber){
         TableOrderResponseDto<OrderDetailDto> responseDto = orderQueryService.getTableOrder(storeId, tableNumber);
         ApiResponse<TableOrderResponseDto<OrderDetailDto>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -137,7 +137,7 @@ public class OrderController {
     /* 주문자의 주문 쥐소 */
     @PatchMapping("/{orderId}/user")
     public ApiResponse<OrderResponseDto<Void>> canceledByUser(@PathVariable(name = "storeId") Long storeId,
-                                                      @PathVariable(name = "orderId") Long orderId){
+                                                              @PathVariable(name = "orderId") Long orderId){
         OrderResponseDto<Void> responseDto = orderUpdateService.canceledByUser(storeId, orderId);
         ApiResponse<OrderResponseDto<Void>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -150,7 +150,7 @@ public class OrderController {
     /* 운영자의 주문 쥐소 */
     @PatchMapping("/{orderId}/admin")
     public ApiResponse<OrderCancelResponseDto> canceledByAdmin(@PathVariable(name = "storeId") Long storeId,
-                                                              @PathVariable(name = "orderId") Long orderId,
+                                                               @PathVariable(name = "orderId") Long orderId,
                                                                @RequestBody OrderCancelRequestDto requestDto){
         OrderCancelResponseDto responseDto = orderUpdateService.canceledByAdmin(storeId, orderId, requestDto);
         ApiResponse<OrderCancelResponseDto> response = new ApiResponse<>(
@@ -165,7 +165,7 @@ public class OrderController {
     @PatchMapping("/{orderId}/status")
     public ApiResponse<OrderResponseDto<Void>> updateOrderStatus(@PathVariable(name = "storeId") Long storeId,
                                                                  @PathVariable(name = "orderId") Long orderId,
-                                                                 @RequestParam OrderStatus orderStatus){
+                                                                 @RequestParam(name = "orderStatus") OrderStatus orderStatus){
         OrderResponseDto<Void> responseDto = orderUpdateService.updateOrderStatus(storeId, orderId, orderStatus);
         ApiResponse<OrderResponseDto<Void>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -178,7 +178,7 @@ public class OrderController {
     /* 해당 테이블의 주문 결제 완료  */
     @PatchMapping("/tables/{tableNumber}/status-paid")
     public ApiResponse<TableOrderResponseDto<TableOrderDetailBriefDto>> updateTableOrderStatusPaid(@PathVariable(name = "storeId") Long storeId,
-                                                                         @PathVariable(name = "tableNumber") Long tableNumber){
+                                                                                                   @PathVariable(name = "tableNumber") Long tableNumber){
         TableOrderResponseDto<TableOrderDetailBriefDto> responseDto = orderUpdateService.updateTableOrderStatusPaid(storeId, tableNumber);
         ApiResponse<TableOrderResponseDto<TableOrderDetailBriefDto>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -191,8 +191,8 @@ public class OrderController {
     /* 주문 수락 */
     @PatchMapping("/{orderId}/order-acceptance")
     public ApiResponse<OrderExpectedPrepTimeResponseDto> acceptOrder(@PathVariable(name = "storeId") Long storeId,
-                                                           @PathVariable(name = "orderId") Long orderId,
-                                                           @RequestBody OrderAcceptedRequestDto requestDto){
+                                                                     @PathVariable(name = "orderId") Long orderId,
+                                                                     @RequestBody OrderAcceptedRequestDto requestDto){
         OrderExpectedPrepTimeResponseDto responseDto = orderUpdateService.acceptOrder(storeId, orderId, requestDto);
         ApiResponse<OrderExpectedPrepTimeResponseDto> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
