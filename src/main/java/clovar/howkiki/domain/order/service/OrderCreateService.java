@@ -133,13 +133,18 @@ public class OrderCreateService {
 
     // 메서드 호출 후 30초 후 상태변경
     public void scheduleOrderStatusUpdate(Order order, String methodUrl) {
-        // 상태가 유저 켄슬드인지 확인
-        if(order.getStatus().equals(USER_CANCELLED)){ return; }
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // 스레드 풀 1개 생성
 
         // 30초 후 상태 변경 작업 실행
         scheduler.schedule(() -> {
+            // 상태가 유저 켄슬드인지 확인
+            Order latestOrder = orderRepository.findById(order.getOrderId())
+                    .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND, methodUrl));
+            if (latestOrder.getStatus().equals(USER_CANCELLED)){
+                return;
+            }
+
             try {
                 order.updateStatus(OrderStatus.AWAITING_ACCEPTANCE);
                 orderRepository.save(order);
@@ -154,13 +159,18 @@ public class OrderCreateService {
 
     // 메서드 호출 후 30초 후 알림 전송
     public void scheduleNewOrderNotice(Order order, String methodUrl) {
-        // 상태가 유저 켄슬드인지 확인
-        if(order.getStatus().equals(USER_CANCELLED)){ return; }
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // 스레드 풀 1개 생성
 
         // 30초 후 상태 변경 작업 실행
         scheduler.schedule(() -> {
+            // 상태가 유저 켄슬드인지 확인
+            Order latestOrder = orderRepository.findById(order.getOrderId())
+                    .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND, methodUrl));
+            if (latestOrder.getStatus().equals(USER_CANCELLED)){
+                return;
+            }
+
             try {
                 notificationService.sendNewOrderNotice(order, order.getStore().getSessionToken());
                 log.info("orderId: " + order.getOrderId() + " - 새로운 주문 도착 알림이 전송되었습니다.");
