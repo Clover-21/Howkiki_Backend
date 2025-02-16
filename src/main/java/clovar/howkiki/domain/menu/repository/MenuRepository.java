@@ -1,13 +1,14 @@
 package clovar.howkiki.domain.menu.repository;
 
 import clovar.howkiki.domain.menu.entity.Menu;
-import clovar.howkiki.domain.store.entity.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     Optional<Menu> findMenuByMenuName(String menuName);
 
