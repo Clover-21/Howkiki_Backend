@@ -3,7 +3,6 @@ package clovar.howkiki.domain.suggestion.controller;
 import clovar.howkiki.domain.suggestion.dto.SuggestionDetailResponseDto;
 import clovar.howkiki.domain.suggestion.dto.SuggestionListResponseDto;
 import clovar.howkiki.domain.suggestion.dto.SuggestionRequestDto;
-import clovar.howkiki.domain.suggestion.dto.SuggestionResponseDto;
 import clovar.howkiki.domain.suggestion.service.SuggestionService;
 import clovar.howkiki.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +35,18 @@ public class SuggestionController {
         return new ApiResponse<SuggestionListResponseDto>(
                 HttpStatus.OK.value(),
                 "건의사항 전체 조회 성공",
+                responseDto
+        );
+    }
+
+    /* 건의사항 상세 조회 */
+    @GetMapping("/{suggestionId}")
+    public ApiResponse<SuggestionDetailResponseDto> getSuggestion(@PathVariable(name = "storeId") Long storeId,
+                                                                  @PathVariable(name = "suggestionId") Long suggestionId){
+        SuggestionDetailResponseDto responseDto = suggestionService.getSuggestion(storeId, suggestionId);
+        return new ApiResponse<SuggestionDetailResponseDto>(
+                HttpStatus.OK.value(),
+                "건의사항 상세 조회 성공",
                 responseDto
         );
     }

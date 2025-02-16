@@ -1,6 +1,5 @@
 package clovar.howkiki.domain.suggestion.dto;
 
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

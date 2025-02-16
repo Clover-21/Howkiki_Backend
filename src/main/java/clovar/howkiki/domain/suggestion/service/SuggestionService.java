@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static clovar.howkiki.global.exception.ErrorCode.STORE_ID_NOT_FOUND;
-import static java.util.Arrays.stream;
+import static clovar.howkiki.global.exception.ErrorCode.SUGGESTION_ID_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +43,8 @@ public class SuggestionService {
         Suggestion savedSuggestion = suggestionRepository.save(suggestion);
 
         return SuggestionDetailResponseDto.from(savedSuggestion);
-
     }
+
 
     /* 건의사항 목록 조회 */
     public SuggestionListResponseDto getAllSuggestions(Long storeId) {
@@ -64,4 +64,20 @@ public class SuggestionService {
                 .suggestionList(suggestionList)
                 .build();
     }
+
+
+    /* 건의사항 상세 조회 */
+    public SuggestionDetailResponseDto getSuggestion(Long storeId, Long suggestionId) {
+        // 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/suggestions/all";
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new CustomException(STORE_ID_NOT_FOUND, methodUrl));
+
+        // 해당 건의사항 찾기
+        Suggestion suggestion = suggestionRepository.findById(suggestionId)
+                .orElseThrow(() -> new CustomException(SUGGESTION_ID_NOT_FOUND, methodUrl));
+
+        return SuggestionDetailResponseDto.from(suggestion);
+    }
+
 }
