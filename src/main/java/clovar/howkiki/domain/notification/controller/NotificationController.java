@@ -27,6 +27,7 @@ public class NotificationController {
 
     /* 요청 사항 알림 */
     @PostMapping("/new-request")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<NewRequestResponseDto> NewRequestNotice(@RequestHeader(name = "sessionToken") String sessionToken,
                                                                @RequestBody NewRequestDto requestDto){
         NewRequestResponseDto responseDto = notificationService.sendNewRequestNotice(sessionToken, requestDto);

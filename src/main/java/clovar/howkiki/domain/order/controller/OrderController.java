@@ -26,6 +26,7 @@ public class OrderController {
 
     /* 주문 생성 */
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<OrderResponseDto<OrderDetailDto>> createOrder(@RequestHeader(name = "sessionToken")String sessionToken,
                                                                      @PathVariable(name = "storeId") Long storeId,
                                                                      @RequestBody OrderCreateRequestDto requestDto){
@@ -43,6 +44,7 @@ public class OrderController {
 
     /* 주문 목록 전체 조회 */
     @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getOrderList(@PathVariable(name = "storeId") Long storeId){
 
         List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getOrderList(storeId);
@@ -56,6 +58,7 @@ public class OrderController {
 
     /* 포장 주문 전체 조회 */
     @GetMapping("/take-out")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<OrderResponseDto<TakeOutOrderDetailBriefDto>>> getTakeOutOrder(@PathVariable(name = "storeId") Long storeId){
 
         List<OrderResponseDto<TakeOutOrderDetailBriefDto>> responseDto = orderQueryService.getTakeOutOrder(storeId);
@@ -69,6 +72,7 @@ public class OrderController {
 
     /* 테이블 주문 전체 조회 */
     @GetMapping("/tables/all")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getTableOrderList(@PathVariable(name = "storeId") Long storeId){
 
         List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTableOrderList(storeId);
@@ -82,6 +86,7 @@ public class OrderController {
 
     /* 특정 상태의 주문 조회 */
     @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getOrderByStatus(@PathVariable(name = "storeId") Long storeId,
                                                                                      @RequestParam(name = "status") OrderStatus status){
         List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getOrderByStatus(storeId, status);
@@ -95,6 +100,7 @@ public class OrderController {
 
     /* 해당 테이블 주문 목록 조회 */
     @GetMapping("/tables/{tableNumber}")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<TableOrderResponseDto<OrderDetailDto>> getTableOrder(@PathVariable(name = "storeId") Long storeId,
                                                                             @PathVariable(name = "tableNumber") Long tableNumber){
         TableOrderResponseDto<OrderDetailDto> responseDto = orderQueryService.getTableOrder(storeId, tableNumber);
@@ -108,6 +114,7 @@ public class OrderController {
 
     /* 주문 상세 조회 */
     @GetMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderResponseDto<OrderDetailDto>> getOrderDetail(@PathVariable(name = "storeId") Long storeId,
                                                                         @PathVariable(name = "orderId") Long orderId){
         OrderResponseDto<OrderDetailDto> responseDto = orderQueryService.getOrderDetail(storeId, orderId);
@@ -121,6 +128,7 @@ public class OrderController {
 
     /* 주문 예상 시간 조회 */
     @GetMapping("/{orderId}/expectedPrepTime")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderExpectedPrepTimeResponseDto> getOrderExpectedPrepTime(@PathVariable(name = "storeId") Long storeId,
                                                                                   @PathVariable(name = "orderId") Long orderId){
         OrderExpectedPrepTimeResponseDto responseDto = orderQueryService.getOrderExpectedPrepTime(storeId, orderId);
@@ -136,6 +144,7 @@ public class OrderController {
 
     /* 주문자의 주문 쥐소 */
     @PatchMapping("/{orderId}/user")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderResponseDto<Void>> canceledByUser(@PathVariable(name = "storeId") Long storeId,
                                                               @PathVariable(name = "orderId") Long orderId){
         OrderResponseDto<Void> responseDto = orderUpdateService.canceledByUser(storeId, orderId);
@@ -149,6 +158,7 @@ public class OrderController {
 
     /* 운영자의 주문 쥐소 */
     @PatchMapping("/{orderId}/admin")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderCancelResponseDto> canceledByAdmin(@PathVariable(name = "storeId") Long storeId,
                                                                @PathVariable(name = "orderId") Long orderId,
                                                                @RequestBody OrderCancelRequestDto requestDto){
@@ -163,6 +173,7 @@ public class OrderController {
 
     /* 주문 상태 변경 */
     @PatchMapping("/{orderId}/status")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderResponseDto<Void>> updateOrderStatus(@PathVariable(name = "storeId") Long storeId,
                                                                  @PathVariable(name = "orderId") Long orderId,
                                                                  @RequestParam(name = "orderStatus") OrderStatus orderStatus){
@@ -177,6 +188,7 @@ public class OrderController {
 
     /* 해당 테이블의 주문 결제 완료  */
     @PatchMapping("/tables/{tableNumber}/status-paid")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<TableOrderResponseDto<TableOrderDetailBriefDto>> updateTableOrderStatusPaid(@PathVariable(name = "storeId") Long storeId,
                                                                                                    @PathVariable(name = "tableNumber") Long tableNumber){
         TableOrderResponseDto<TableOrderDetailBriefDto> responseDto = orderUpdateService.updateTableOrderStatusPaid(storeId, tableNumber);
@@ -190,6 +202,7 @@ public class OrderController {
 
     /* 주문 수락 */
     @PatchMapping("/{orderId}/order-acceptance")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderExpectedPrepTimeResponseDto> acceptOrder(@PathVariable(name = "storeId") Long storeId,
                                                                      @PathVariable(name = "orderId") Long orderId,
                                                                      @RequestBody OrderAcceptedRequestDto requestDto){

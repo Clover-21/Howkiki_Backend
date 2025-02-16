@@ -18,6 +18,7 @@ public class SuggestionController {
 
     /* 건의사항 등록 */
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<SuggestionDetailResponseDto> createSuggestion(@PathVariable(name = "storeId") Long storeId,
                                                                      @RequestBody SuggestionRequestDto requestDto){
         SuggestionDetailResponseDto responseDto = suggestionService.createSuggestion(storeId, requestDto);
@@ -30,6 +31,7 @@ public class SuggestionController {
 
     /* 건의사항 목록 조회 */
     @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<SuggestionListResponseDto> getAllSuggestions(@PathVariable(name = "storeId") Long storeId){
         SuggestionListResponseDto responseDto = suggestionService.getAllSuggestions(storeId);
         return new ApiResponse<SuggestionListResponseDto>(
@@ -41,6 +43,7 @@ public class SuggestionController {
 
     /* 건의사항 상세 조회 */
     @GetMapping("/{suggestionId}")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<SuggestionDetailResponseDto> getSuggestion(@PathVariable(name = "storeId") Long storeId,
                                                                   @PathVariable(name = "suggestionId") Long suggestionId){
         SuggestionDetailResponseDto responseDto = suggestionService.getSuggestion(storeId, suggestionId);
