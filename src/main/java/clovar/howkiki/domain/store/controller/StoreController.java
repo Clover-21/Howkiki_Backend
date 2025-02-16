@@ -17,9 +17,10 @@ public class StoreController {
 
     /* 가게명으로 가게 정보 조회 */
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<StoreIdResponseDto> getStoreId(@RequestBody StoreIdRequestDto requestDto) {
         StoreIdResponseDto responseDto = storeService.getStoreId(requestDto);
-        return new ApiResponse<StoreIdResponseDto>(
+        return new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "가게 정보 조회 성공",
                 responseDto

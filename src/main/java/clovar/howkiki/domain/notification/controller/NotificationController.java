@@ -27,15 +27,15 @@ public class NotificationController {
 
     /* 요청 사항 알림 */
     @PostMapping("/new-request")
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<NewRequestResponseDto> NewRequestNotice(@RequestHeader(name = "sessionToken") String sessionToken,
                                                                @RequestBody NewRequestDto requestDto){
         NewRequestResponseDto responseDto = notificationService.sendNewRequestNotice(sessionToken, requestDto);
-        ApiResponse<NewRequestResponseDto> response = new ApiResponse<>(
+        return new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "사용자 요청 도착 알림 전송 성공",
                 responseDto
         );
-        return response;
     }
 
 
