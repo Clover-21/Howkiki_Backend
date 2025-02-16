@@ -22,7 +22,7 @@ public class SuggestionController {
     public ApiResponse<SuggestionDetailResponseDto> createSuggestion(@PathVariable(name = "storeId") Long storeId,
                                                                      @RequestBody SuggestionRequestDto requestDto){
         SuggestionDetailResponseDto responseDto = suggestionService.createSuggestion(storeId, requestDto);
-        return new ApiResponse<SuggestionDetailResponseDto>(
+        return new ApiResponse<>(
                 HttpStatus.CREATED.value(),
                 "건의 사항 등록 성공",
                 responseDto
@@ -34,7 +34,7 @@ public class SuggestionController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<SuggestionListResponseDto> getAllSuggestions(@PathVariable(name = "storeId") Long storeId){
         SuggestionListResponseDto responseDto = suggestionService.getAllSuggestions(storeId);
-        return new ApiResponse<SuggestionListResponseDto>(
+        return new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "건의사항 전체 조회 성공",
                 responseDto
@@ -47,7 +47,7 @@ public class SuggestionController {
     public ApiResponse<SuggestionDetailResponseDto> getSuggestion(@PathVariable(name = "storeId") Long storeId,
                                                                   @PathVariable(name = "suggestionId") Long suggestionId){
         SuggestionDetailResponseDto responseDto = suggestionService.getSuggestion(storeId, suggestionId);
-        return new ApiResponse<SuggestionDetailResponseDto>(
+        return new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "건의사항 상세 조회 성공",
                 responseDto

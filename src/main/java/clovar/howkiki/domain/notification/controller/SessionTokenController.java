@@ -23,11 +23,10 @@ public class SessionTokenController {
         String sessionToken = UUID.randomUUID().toString();  // 랜덤한 세션 토큰 생성
         session.setAttribute("sessionToken", sessionToken);  // 세션에 저장
 
-        ApiResponse<String> response = new ApiResponse<>(
+        return new ApiResponse<>(
                 HttpStatus.CREATED.value(),
                 "세션 토큰 발급 성공",
                 sessionToken
         );
-        return response;
     }
 }
