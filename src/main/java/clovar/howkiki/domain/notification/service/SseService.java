@@ -26,8 +26,10 @@ public class SseService {
     public SseEmitter subscribe(String sessionToken) {
         // 기존 Emitter가 있다면 삭제
         if (emitters.containsKey(sessionToken)) {
-            log.info("기존 SSE Emitter 삭제 - sessionToken: {}", sessionToken);
-            emitters.remove(sessionToken);
+//            log.info("기존 SSE Emitter 삭제 - sessionToken: {}", sessionToken);
+//            emitters.remove(sessionToken);
+
+            log.info("기존 SSE Emitter가 존재합니다. - sessionToken: {}", sessionToken);
         }
 
         SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
@@ -35,7 +37,7 @@ public class SseService {
 
         // 사용자에게 모든 데이터 전송되었다면 emitter 삭제
         sseEmitter.onCompletion(() -> {
-            log.info("emitter 삭제: SSE Emitter 완료됨 - sessionToken: {}", sessionToken);
+            log.info("emitter 삭제: SSE Emitter 정상 종료 - sessionToken: {}", sessionToken);
             emitters.remove(sessionToken);
         });
         // emitter의 유효시간 만료시 emmitter 삭제
@@ -43,6 +45,9 @@ public class SseService {
             log.info("emitter 삭제: SSE Emitter 타임아웃 - sessionToken: {}", sessionToken);
             emitters.remove(sessionToken);
         });
+
+        // 현재 등록된 Emitter 개수 확인
+        log.info("🔍 현재 저장된 SSE Emitter 개수: {}", emitters.size());
 
         // 503 에러 방지를 위해 초기 더미 데이터 전송
         try {
@@ -70,6 +75,11 @@ public class SseService {
 
     /* 알림 전송 */
     public <T> void sendNotification(String sessionToken, T responseDto) {
+        if (!emitters.containsKey(sessionToken)) {
+            log.warn("⚠️ 알림 전송 실패: 해당 세션 토큰의 Emitter 없음 - sessionToken: {}", sessionToken);
+            return;
+        }
+
         // 해당 세션 토큰을 가진 사용자의 SSE 연결을 찾음
         SseEmitter emitter = getSseEmitter(sessionToken);
 
