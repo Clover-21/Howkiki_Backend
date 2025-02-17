@@ -7,19 +7,22 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TableOrderDetailBriefDto {
+public class PaidOrderDetailBriefDto {
     private Long orderId;
     private OrderStatus status;
+    private String userSessionToken;
 
-    public TableOrderDetailBriefDto(Long orderId, OrderStatus status) {
+    public PaidOrderDetailBriefDto(Long orderId, OrderStatus status, String userSessionToken) {
         this.orderId = orderId;
         this.status = status;
+        this.userSessionToken = userSessionToken;
     }
 
-    public static TableOrderDetailBriefDto from(Order order) {
-        return new TableOrderDetailBriefDto(
+    public static PaidOrderDetailBriefDto from(Order order) {
+        return new PaidOrderDetailBriefDto(
                 order.getOrderId(),
-                order.getStatus()
+                order.getStatus(),
+                order.getSessionToken()
         );
     }
 }

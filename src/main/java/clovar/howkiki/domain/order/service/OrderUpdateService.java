@@ -103,7 +103,7 @@ public class OrderUpdateService {
     }
 
     /* 해당 테이블 주문 결제 완료 */
-    public TableOrderResponseDto<TableOrderDetailBriefDto> updateTableOrderStatusPaid(Long storeId, Long tableNumber) {
+    public TableOrderResponseDto<PaidOrderDetailBriefDto> updateTableOrderStatusPaid(Long storeId, Long tableNumber) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+ storeId +"/orders/tables/" +tableNumber + "/status-paid";
@@ -114,15 +114,29 @@ public class OrderUpdateService {
 
         // orderList 생성
         Long totalPrice = 0L;
-        List<TableOrderDetailBriefDto> orderList = new ArrayList<>();
+        List<PaidOrderDetailBriefDto> orderList = new ArrayList<>();
         for (Order order : orders) {
             order.updateStatus(PAID);
-            orderList.add(TableOrderDetailBriefDto.from(order));
+            orderList.add(PaidOrderDetailBriefDto.from(order));
             totalPrice += order.getOrderPrice();
         }
 
         return TableOrderResponseDto.from(tableNumber, totalPrice, orderList);
 
+    }
+
+    /* 포장 주문 결제 완료 */
+    public PaidOrderDetailBriefDto updateTakeOutOrderStatusPaid(Long storeId, Long orderId) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/" + orderId + "/take-out/status-paid";
+        findStore(storeId, methodUrl);
+
+        // 해당 포장 주문 조회
+        Order order = orderRepository.findOrderByOrderId(orderId);
+        order.updateStatus(PAID);
+
+        return PaidOrderDetailBriefDto.from(order);
     }
 
     /* 주문 수락 */
