@@ -24,14 +24,13 @@ public class StoreService {
     }
 
     /* 가게명으로 가게ID 조회 */
-    public StoreIdResponseDto getStoreId(StoreIdRequestDto requestDto){
+    public StoreIdResponseDto getStoreId(String storeName){
 
         // 예외: 파라미터(가게명)이 누락된 경우
-        if (requestDto.getStoreName() == null) {
+        if (storeName == null) {
             throw new CustomException(MISSING_PARAMETER, "/stores");
         }
 
-        String storeName = requestDto.getStoreName();
         Store store = storeRepository.findByStoreName(storeName);
 
         // 예외 : 해당 이름의 가게가 없는 경우
