@@ -61,4 +61,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "SELECT * FROM `orders` o WHERE o.session_token = :userSessionToken ORDER BY o.order_id DESC LIMIT 1", nativeQuery = true)
     Order findRecentOrderBySessionToken(@Param("userSessionToken") String userSessionToken);
 
+    // 주문자의 주문 목록 조회 (상태가 PAID가 아닌)
+    @Query("SELECT o From Order o WHERE o.store.storeId = :storeId " +
+            "AND o.sessionToken = :userSessionToken " +
+            "AND o.status NOT IN ('PAID')" +
+            "ORDER BY o.orderId DESC")
+    List<Order> findOrderBySessionToken(@Param("storeId")Long storeId, @Param("userSessionToken") String sessionToken);
+
 }

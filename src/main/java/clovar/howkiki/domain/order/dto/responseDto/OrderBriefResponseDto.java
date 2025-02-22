@@ -7,19 +7,19 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class TableOrderResponseDto<T> {
+public class OrderBriefResponseDto<T> {
     private Long tableNumber;
     private Long tableTotalPrice;
     private List<T> orderList;
 
-    public TableOrderResponseDto(Long tableNumber, Long tableTotalPrice, List<T> orderList) {
+    public OrderBriefResponseDto(Long tableNumber, Long tableTotalPrice, List<T> orderList) {
         this.tableNumber = tableNumber;
         this.tableTotalPrice = tableTotalPrice;
         this.orderList = orderList;
     }
 
-    public static <T> TableOrderResponseDto<T> from (Long tableNumber, Long price, List<T> orderList) {
-        return new TableOrderResponseDto<T>(
+    public static <T> OrderBriefResponseDto<T> from (Long tableNumber, Long price, List<T> orderList) {
+        return new OrderBriefResponseDto<T>(
                 tableNumber,
                 price,
                 orderList

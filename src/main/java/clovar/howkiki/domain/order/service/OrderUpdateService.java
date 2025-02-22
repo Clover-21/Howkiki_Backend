@@ -103,7 +103,7 @@ public class OrderUpdateService {
     }
 
     /* 해당 테이블 주문 결제 완료 */
-    public TableOrderResponseDto<PaidOrderDetailBriefDto> updateTableOrderStatusPaid(Long storeId, Long tableNumber) {
+    public OrderBriefResponseDto<PaidOrderDetailBriefDto> updateTableOrderStatusPaid(Long storeId, Long tableNumber) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+ storeId +"/orders/tables/" +tableNumber + "/status-paid";
@@ -121,7 +121,7 @@ public class OrderUpdateService {
             totalPrice += order.getOrderPrice();
         }
 
-        return TableOrderResponseDto.from(tableNumber, totalPrice, orderList);
+        return OrderBriefResponseDto.from(tableNumber, totalPrice, orderList);
 
     }
 
