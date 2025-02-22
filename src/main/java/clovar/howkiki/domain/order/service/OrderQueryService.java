@@ -10,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static clovar.howkiki.domain.order.entity.OrderStatus.*;
 import static clovar.howkiki.global.exception.ErrorCode.STORE_ID_NOT_FOUND;
@@ -51,17 +49,37 @@ public class OrderQueryService {
     }
 
     /* 테이블 주문 전체 조회 */
-    public List<OrderResponseDto<OrderDetailBriefDto>> getTableOrderList(Long storeId) {
+    public List<AllTableOrderResponseDto> getTableOrderList(Long storeId) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+storeId+"/orders/tables/all";
         findStore(storeId, methodUrl);
 
-        // 해당 가게의 테이블 주문 조회
+        // 1. 해당 가게의 모든 주문 가져오기 (상태가 수락대기, 진행중, 완료 인 것만)
         List<Order> orders = orderRepository.findTableOrderByStoreId(storeId);
 
-        return getOrderResponseDtos(orders);
+        // 2. 테이블 번호별로 주문 상세(orderDetail) 그룹화
+        Map<Long, List<OrderDetailBriefDto>> tableOrder = new HashMap<>();
+
+        for (Order order : orders) {
+            Long tableNumber = order.getTableNumber();
+            List<OrderDetailBriefDto> orderDetails = order.getOrderDetails().stream()
+                    .map(OrderDetailBriefDto::from)
+                    .toList();
+
+            // 기존 테이블의 주문 상세와 합치기
+            tableOrder
+                    .computeIfAbsent(tableNumber, k -> new ArrayList<>())
+                    .addAll(orderDetails);
+        }
+
+        // 3. 테이블별 주문 DTO 리스트 생성
+        return tableOrder.entrySet().stream()
+                .map(entry -> new AllTableOrderResponseDto(entry.getKey(), entry.getValue()))
+                .toList();
+
     }
+
 
     /* 특정 상태의 주문 목록 조회 */
     public List<OrderResponseDto<OrderDetailBriefDto>> getOrderByStatus(Long storeId, OrderStatus status) {

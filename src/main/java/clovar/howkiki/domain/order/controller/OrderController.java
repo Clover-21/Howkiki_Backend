@@ -70,9 +70,9 @@ public class OrderController {
     /* 테이블 주문 전체 조회 */
     @GetMapping("/tables/all")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<List<OrderResponseDto<OrderDetailBriefDto>>> getTableOrderList(@PathVariable(name = "storeId") Long storeId){
+    public ApiResponse<List<AllTableOrderResponseDto>> getTableOrderList(@PathVariable(name = "storeId") Long storeId){
 
-        List<OrderResponseDto<OrderDetailBriefDto>> responseDto = orderQueryService.getTableOrderList(storeId);
+        List<AllTableOrderResponseDto> responseDto = orderQueryService.getTableOrderList(storeId);
         return new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "테이블 주문 목록 전체 조회 성공",
