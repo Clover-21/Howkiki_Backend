@@ -26,13 +26,12 @@ public class SseService {
     public SseEmitter subscribe(String sessionToken) {
         // 기존 Emitter가 있다면 삭제
         if (emitters.containsKey(sessionToken)) {
-//            log.info("기존 SSE Emitter 삭제 - sessionToken: {}", sessionToken);
-//            emitters.remove(sessionToken);
-
+            log.info("기존 SSE Emitter 삭제 - sessionToken: {}", sessionToken);
+            emitters.remove(sessionToken);
             log.info("기존 SSE Emitter가 존재합니다. - sessionToken: {}", sessionToken);
         }
 
-        SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
+        SseEmitter sseEmitter = new SseEmitter(60L * 60L * 1000L);  // 1시간 유지
         emitters.put(sessionToken, sseEmitter);
 
         // 사용자에게 모든 데이터 전송되었다면 emitter 삭제
@@ -88,15 +87,15 @@ public class SseService {
             String jsonData = objectMapper.writeValueAsString(responseDto);
             log.info("📢 알림 전송할 데이터(JSON 변환됨): {}", jsonData);
 
-            // 알림 전송
-            emitter.send(SseEmitter.event()
-                    .name("notification")
-                    .data(jsonData));
+            // 먼저 연결이 살아있는지 확인후 전송
+            synchronized (emitter) {
+                emitter.send(SseEmitter.event().name("notification").data(jsonData));
+            }
             log.info("✅ SSE 메시지 전송 완료!");
 
         } catch (Exception e) {
-            emitters.remove(sessionToken);
             log.error("❌ SSE 메시지 전송 실패 - sessionToken: {} - {}", sessionToken, e.getMessage());
+            emitters.remove(sessionToken);
             throw new CustomException(FAILED_TO_SEND_NOTICE, null);
         }
     }

@@ -10,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import static clovar.howkiki.domain.order.entity.OrderStatus.*;
 import static clovar.howkiki.global.exception.ErrorCode.STORE_ID_NOT_FOUND;
 
 @Service
@@ -36,7 +36,7 @@ public class OrderQueryService {
     }
 
     /* 포장 주문 전체 조회 */
-    public List<OrderResponseDto<TakeOutOrderDetailBriefDto>> getTakeOutOrder(Long storeId) {
+    public List<OrderResponseDto<OrderDetailBriefWithPriceDto>> getTakeOutOrder(Long storeId) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+storeId+"/orders/take-out";
@@ -49,17 +49,37 @@ public class OrderQueryService {
     }
 
     /* 테이블 주문 전체 조회 */
-    public List<OrderResponseDto<OrderDetailBriefDto>> getTableOrderList(Long storeId) {
+    public List<AllTableOrderResponseDto> getTableOrderList(Long storeId) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+storeId+"/orders/tables/all";
         findStore(storeId, methodUrl);
 
-        // 해당 가게의 테이블 주문 조회
+        // 1. 해당 가게의 모든 주문 가져오기 (상태가 수락대기, 진행중, 완료 인 것만)
         List<Order> orders = orderRepository.findTableOrderByStoreId(storeId);
 
-        return getOrderResponseDtos(orders);
+        // 2. 테이블 번호별로 주문 상세(orderDetail) 그룹화
+        Map<Long, List<OrderDetailBriefDto>> tableOrder = new HashMap<>();
+
+        for (Order order : orders) {
+            Long tableNumber = order.getTableNumber();
+            List<OrderDetailBriefDto> orderDetails = order.getOrderDetails().stream()
+                    .map(OrderDetailBriefDto::from)
+                    .toList();
+
+            // 기존 테이블의 주문 상세와 합치기
+            tableOrder
+                    .computeIfAbsent(tableNumber, k -> new ArrayList<>())
+                    .addAll(orderDetails);
+        }
+
+        // 3. 테이블별 주문 DTO 리스트 생성
+        return tableOrder.entrySet().stream()
+                .map(entry -> new AllTableOrderResponseDto(entry.getKey(), entry.getValue()))
+                .toList();
+
     }
+
 
     /* 특정 상태의 주문 목록 조회 */
     public List<OrderResponseDto<OrderDetailBriefDto>> getOrderByStatus(Long storeId, OrderStatus status) {
@@ -76,7 +96,7 @@ public class OrderQueryService {
 
 
     /* 해당 테이블 주문 목록 조회 */
-    public TableOrderResponseDto<OrderDetailDto> getTableOrder(Long storeId, Long tableNumber) {
+    public OrderBriefResponseDto<OrderDetailDto> getTableOrder(Long storeId, Long tableNumber) {
 
         // 검증 - 해당 가게 찾기
         String methodUrl = "/stores/"+ storeId +"/orders/tables/" +tableNumber;
@@ -98,7 +118,7 @@ public class OrderQueryService {
             totalPrice += order.getOrderPrice();
         }
 
-        return TableOrderResponseDto.from(tableNumber, totalPrice, orderDetails);
+        return OrderBriefResponseDto.from(tableNumber, totalPrice, orderDetails);
     }
 
 
@@ -132,6 +152,36 @@ public class OrderQueryService {
         return OrderExpectedPrepTimeResponseDto.from(order);
     }
 
+
+    /* 주문자의 주문 목록 조회 */
+    public OrderBriefResponseDto<UserOrderDto<OrderDetailBriefWithPriceDto>> getUserAllOrder(Long storeId, String sessionToken) {
+
+        // 검증 - 해당 가게 찾기
+        String methodUrl = "/stores/"+ storeId +"/orders/user";
+        findStore(storeId, methodUrl);
+
+        // 해당 세션토큰의 주문 조회
+        List<Order> orders = orderRepository.findOrderBySessionToken(storeId, sessionToken);
+
+        // 주문이 없을 경우 안전한 값 반환
+        if (orders == null || orders.isEmpty()) {
+            return OrderBriefResponseDto.from(null, 0L, Collections.emptyList());
+        }
+
+        Long tableNumber = orderRepository.findRecentOrderBySessionToken(sessionToken).getTableNumber();
+
+        // 총액 계산
+        Long totalPrice = orders.stream()
+                .filter(order -> order.getStatus() != USER_CANCELLED && order.getStatus() != ADMIN_CANCELLED)
+                .mapToLong(Order::getOrderPrice)
+                .sum();
+
+        // orderList 생성
+        List<UserOrderDto<OrderDetailBriefWithPriceDto>> orderList = getUserOrderResponseDtos(orders);
+
+        return OrderBriefResponseDto.from(tableNumber, totalPrice, orderList);
+    }
+
     /*-----------------------------------------------------------*/
 
     // 가게 존재 검증
@@ -160,23 +210,41 @@ public class OrderQueryService {
     }
 
     // 포장 주문 목록 dto 반환
-    private static List<OrderResponseDto<TakeOutOrderDetailBriefDto>> getTakeOutOrderResponseDtos(List<Order> orders) {
-        List<OrderResponseDto<TakeOutOrderDetailBriefDto>> orderResponseDtos = new ArrayList<>();  // 주문 목록 리스트
+    private static List<OrderResponseDto<OrderDetailBriefWithPriceDto>> getTakeOutOrderResponseDtos(List<Order> orders) {
+        List<OrderResponseDto<OrderDetailBriefWithPriceDto>> orderResponseDtos = new ArrayList<>();  // 주문 목록 리스트
 
         // 각 주문에 대한 orderDetail 가져와서 orderDetailBriefDto 형식인 orderDetail 생성한 후, 리스트화
         for (Order order : orders) {
             // orderDetails 생성
-            List<TakeOutOrderDetailBriefDto> orderDetails = order.getOrderDetails().stream()
-                    .map(TakeOutOrderDetailBriefDto::from)
+            List<OrderDetailBriefWithPriceDto> orderDetails = order.getOrderDetails().stream()
+                    .map(OrderDetailBriefWithPriceDto::from)
                     .toList();
 
             // 주문 1개
-            OrderResponseDto<TakeOutOrderDetailBriefDto> orderResponseDto = OrderResponseDto.fromWithOrderDetail(order, orderDetails);
+            OrderResponseDto<OrderDetailBriefWithPriceDto> orderResponseDto = OrderResponseDto.fromWithOrderDetail(order, orderDetails);
             // 주문 1개 리스트에 추가
             orderResponseDtos.add(orderResponseDto);
         }
         return orderResponseDtos;
     }
 
+    // 주문자의 주문 목록 dto 반환
+    private static List<UserOrderDto<OrderDetailBriefWithPriceDto>> getUserOrderResponseDtos(List<Order> orders) {
+        List<UserOrderDto<OrderDetailBriefWithPriceDto>> orderResponseDtos = new ArrayList<>();  // 주문 목록 리스트
+
+        // 각 주문에 대한 orderDetail 가져와서 orderDetailBriefDto 형식인 orderDetail 생성한 후, 리스트화
+        for (Order order : orders) {
+            // orderDetails 생성
+            List<OrderDetailBriefWithPriceDto> orderDetails = order.getOrderDetails().stream()
+                    .map(OrderDetailBriefWithPriceDto::from)
+                    .toList();
+
+            // 주문 1개
+            UserOrderDto<OrderDetailBriefWithPriceDto> orderResponseDto = UserOrderDto.from(order, orderDetails);
+            // 주문 1개 리스트에 추가
+            orderResponseDtos.add(orderResponseDto);
+        }
+        return orderResponseDtos;
+    }
 
 }
