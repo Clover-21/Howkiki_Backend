@@ -20,6 +20,7 @@ public class MenuService {
     /* 메뉴 사진 URL 조회 */
     public MenuImgResponseDto getMenuImgUrl(Long storeId, String menuName){
 
+        // 메뉴 찾기
         Menu menu = menuRepository.findMenuByStoreIdAndMenuName(storeId, menuName);
 
         // 해당 이름의 메뉴가 존재하지 않는 경우
@@ -29,6 +30,5 @@ public class MenuService {
         }
 
         return MenuImgResponseDto.from(menu);
-
     }
 }

@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/stores/{storeId}")
+@RequestMapping("/stores/{storeId}/menu")
 public class MenuController {
 
     private final MenuService menuService;
 
     /* 메뉴 사진 URL 조회 */
-    @GetMapping("/menu/img")
+    @GetMapping("/img")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<MenuImgResponseDto> getMenuImgUrl(@PathVariable(name = "storeId") Long storeId,
                                                          @RequestParam(name = "menuName") String menuName) {

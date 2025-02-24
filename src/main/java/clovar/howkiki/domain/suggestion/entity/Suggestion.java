@@ -20,7 +20,7 @@ public class Suggestion extends BaseEntity {
     private Long suggestionId;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storeId", nullable = false)
     private Store store;
 
