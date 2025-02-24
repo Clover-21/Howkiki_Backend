@@ -2,15 +2,14 @@ package clovar.howkiki.domain.notification.service;
 
 import clovar.howkiki.global.exception.CustomException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import static clovar.howkiki.global.exception.ErrorCode.*;
 
@@ -116,5 +115,24 @@ public class SseService {
             throw new CustomException(SESSION_TOKEN_NOT_VALID, null);
         }
     }
+
+    @PreDestroy
+    public void shutdown() {
+        log.info("서버 종료: 모든 SSE 연결을 정리합니다...");
+
+        // 안전한 반복을 위해 복사 후 처리
+        List<SseEmitter> emitterList = new ArrayList<>(emitters.values());
+        for (SseEmitter emitter : emitterList) {
+            try {
+                emitter.complete(); // 정상 종료
+            } catch (Exception e) {
+                log.error("SSE 종료 중 오류 발생: {}", e.getMessage());
+            }
+        }
+
+        emitters.clear(); // 모든 Emitter 제거
+        log.info("모든 SSE 연결 정리 완료");
+    }
+
 
 }
