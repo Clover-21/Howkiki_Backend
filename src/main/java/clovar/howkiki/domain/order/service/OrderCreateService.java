@@ -48,7 +48,7 @@ public class OrderCreateService {
         validateOrderRequest(requestDto, storeId);
 
         // 해당 가게 찾기
-        String methodUrl = "/stores/"+ storeId +"/stores/"+storeId+"/orders";
+        String methodUrl = "/stores/"+ storeId + "/orders";
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(STORE_ID_NOT_FOUND, methodUrl));
 
