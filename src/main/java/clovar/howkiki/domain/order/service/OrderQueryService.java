@@ -58,8 +58,9 @@ public class OrderQueryService {
         // 1. 해당 가게의 모든 주문 가져오기 (상태가 수락대기, 진행중, 완료 인 것만)
         List<Order> orders = orderRepository.findTableOrderByStoreId(storeId);
 
-        // 2. 테이블 번호별로 주문 상세(orderDetail) 그룹화
+        // 2. 테이블 번호별로 주문 상세(orderDetail) 및 주문 가격 그룹화
         Map<Long, List<OrderDetailBriefDto>> tableOrder = new HashMap<>();
+        Map<Long, Long> tableTotalPrice = new HashMap<>();
 
         for (Order order : orders) {
             Long tableNumber = order.getTableNumber();
@@ -71,11 +72,18 @@ public class OrderQueryService {
             tableOrder
                     .computeIfAbsent(tableNumber, k -> new ArrayList<>())
                     .addAll(orderDetails);
+
+            // 기존 총 가격과 현재 주문 가격을 합산
+            tableTotalPrice.put(tableNumber, tableTotalPrice.getOrDefault(tableNumber, 0L) + order.getOrderPrice());
         }
 
         // 3. 테이블별 주문 DTO 리스트 생성
         return tableOrder.entrySet().stream()
-                .map(entry -> new AllTableOrderResponseDto(entry.getKey(), entry.getValue()))
+                .map(entry -> new AllTableOrderResponseDto(
+                        entry.getKey(),
+                        tableTotalPrice.getOrDefault(entry.getKey(), 0L), // 총 가격
+                        entry.getValue()
+                ))
                 .toList();
 
     }
