@@ -26,7 +26,10 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:3001",
                 "https://localhost:3001/",
-                "https://howkiki.netlify.app"));  // 프론트 배포 후 주소 추가
+                "https://howkiki.netlify.app",
+"https://silver-tiramisu-633e4a.netlify.app/
+https://app.netlify.com/sites/kikibot/overview",
+"https://silver-tiramisu-633e4a.netlify.app/"));  // 프론트 배포 후 주소 추가
 
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
