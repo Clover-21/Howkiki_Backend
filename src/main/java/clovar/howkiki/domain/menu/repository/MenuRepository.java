@@ -19,4 +19,9 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("SELECT m FROM Menu m WHERE m.store.storeId = :storeId AND m.menuName = :menuName")
     Menu findMenuByStoreIdAndMenuName(@Param("storeId") Long storeId, @Param("menuName") String menuName);
 
+    // 메뉴 이름 존재 여부 확인
+    @Query("SELECT COUNT(m) > 0 FROM Menu m " +
+            "WHERE m.store.storeId = :storeId AND m.menuName = :menuName ")
+    boolean existsByMenuName(@Param("storeId")Long storeId, @Param("menuName")String menuName);
+
 }
