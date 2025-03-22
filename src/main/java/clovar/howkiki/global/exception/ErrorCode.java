@@ -35,7 +35,11 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(NOT_FOUND, "요청자의 최근 주문이 존재하지 않습니다."),
 
     // suggestion
-    SUGGESTION_ID_NOT_FOUND(NOT_FOUND, "해당 Id의 건의사항을 찾을 수 없습니다.");
+    SUGGESTION_ID_NOT_FOUND(NOT_FOUND, "해당 Id의 건의사항을 찾을 수 없습니다."),
+
+    // menu
+    MENU_NAME_ALREADY_EXISTS(BAD_REQUEST, "이미 존재하는 메뉴 이름입니다."),
+    FAILED_TO_UPLOAD_IMG(INTERNAL_SERVER_ERROR, "파일 업로드에 실패하였슴니다.");
 
     private final HttpStatus status;
     private final String message;

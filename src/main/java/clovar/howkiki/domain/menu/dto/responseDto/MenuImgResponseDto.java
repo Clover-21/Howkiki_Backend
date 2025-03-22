@@ -1,4 +1,4 @@
-package clovar.howkiki.domain.menu.dto;
+package clovar.howkiki.domain.menu.dto.responseDto;
 
 import clovar.howkiki.domain.menu.entity.Menu;
 import lombok.Getter;
