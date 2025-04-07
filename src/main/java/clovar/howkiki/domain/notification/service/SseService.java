@@ -35,15 +35,14 @@ public class SseService {
         }
 
         // emitter 생성
-        SseEmitter sseEmitter = new SseEmitter(60L * 60L * 1000L);  // 1시간 유지
+        SseEmitter sseEmitter = new SseEmitter(3* 60 * 1000L);  // 3분간 서버에서 아무것도 보내지 않으면 타임아웃되도록 설정
         emitters.put(sessionToken, sseEmitter);
 
-        // 연결 지속을 위한 ping 보내기
+        // 연결 지속을 위한 ping 보내기 (30초마다)
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 sseEmitter.send(SseEmitter.event().name("ping").data("연결 중단 방지용 ping"));
-                log.debug("💓 ping sent to sessionToken: {}", sessionToken);
             } catch (IOException e) {
                 log.warn("❌ ping failed - sessionToken: {}", sessionToken);
                 emitters.remove(sessionToken);
