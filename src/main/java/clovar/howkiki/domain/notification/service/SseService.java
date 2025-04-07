@@ -11,6 +11,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static clovar.howkiki.global.exception.ErrorCode.*;
 
 @Service
@@ -30,8 +34,23 @@ public class SseService {
             log.info("기존 SSE Emitter가 존재합니다. - sessionToken: {}", sessionToken);
         }
 
+        // emitter 생성
         SseEmitter sseEmitter = new SseEmitter(60L * 60L * 1000L);  // 1시간 유지
         emitters.put(sessionToken, sseEmitter);
+
+        // 연결 지속을 위한 ping 보내기
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                sseEmitter.send(SseEmitter.event().name("ping").data("연결 중단 방지용 ping"));
+                log.debug("💓 ping sent to sessionToken: {}", sessionToken);
+            } catch (IOException e) {
+                log.warn("❌ ping failed - sessionToken: {}", sessionToken);
+                emitters.remove(sessionToken);
+                sseEmitter.complete();
+                scheduler.shutdown();  // 더 이상 heartbeat 안 보내도록 종료
+            }
+        }, 30, 30, TimeUnit.SECONDS); // 30초마다
 
         // 사용자에게 모든 데이터 전송되었다면 emitter 삭제
         sseEmitter.onCompletion(() -> {
