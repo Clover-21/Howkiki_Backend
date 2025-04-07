@@ -45,9 +45,6 @@ public class SseService {
                 sseEmitter.send(SseEmitter.event().name("ping").data("연결 중단 방지용 ping"));
             } catch (IOException e) {
                 log.warn("❌ ping failed - sessionToken: {}", sessionToken);
-                emitters.remove(sessionToken);
-                sseEmitter.complete();
-                scheduler.shutdown();  // 더 이상 heartbeat 안 보내도록 종료
             }
         }, 30, 30, TimeUnit.SECONDS); // 30초마다
 
