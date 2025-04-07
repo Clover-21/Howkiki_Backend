@@ -48,11 +48,12 @@ public class SseService {
             }
         }, 30, 30, TimeUnit.SECONDS); // 30초마다
 
-        // 사용자에게 모든 데이터 전송되었다면 emitter 삭제
-        sseEmitter.onCompletion(() -> {
-            log.info("emitter 삭제: SSE Emitter 정상 종료 - sessionToken: {}", sessionToken);
-            emitters.remove(sessionToken);
-        });
+        // 한 번 요청이 들어온 후 아래의 로직 떄문에 더이상 알림이 안오는 문제 발생, 잠시 주석 처리
+//        // 사용자에게 모든 데이터 전송되었다면 emitter 삭제
+//        sseEmitter.onCompletion(() -> {
+//            log.info("emitter 삭제: SSE Emitter 정상 종료 - sessionToken: {}", sessionToken);
+//            emitters.remove(sessionToken);
+//        });
         // emitter의 유효시간 만료시 emmitter 삭제
         sseEmitter.onTimeout(() -> {
             log.info("emitter 삭제: SSE Emitter 타임아웃 - sessionToken: {}", sessionToken);
