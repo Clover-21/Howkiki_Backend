@@ -24,63 +24,41 @@ public class SseService {
 
     private final ObjectMapper objectMapper; // json으로 변환 위함
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();  // 동시성 고려
-    // 각 emitter별 ping 실패 횟수를 저장하는 맵 (최대 허용 실패 횟수: 예시로 3회)
-    private final Map<String, Integer> pingFailureCounts = new ConcurrentHashMap<>();
-    private static final int MAX_PING_FAILURE_COUNT = 3;
 
     /* SSE 구독 - (클라이언트가 SSE 연결할 때 호출되어 알림 받을 준비) */
     public SseEmitter subscribe(String sessionToken) {
         // 기존 Emitter가 있다면 삭제
         if (emitters.containsKey(sessionToken)) {
-            log.info("기존 SSE Emitter가 존재합니다. 기존 emitter 삭제 후 다시 생성- sessionToken: {}", sessionToken);
+            log.info("기존 SSE Emitter 삭제 - sessionToken: {}", sessionToken);
             emitters.remove(sessionToken);
+            log.info("기존 SSE Emitter가 존재합니다. - sessionToken: {}", sessionToken);
         }
 
         // emitter 생성
         SseEmitter sseEmitter = new SseEmitter(60* 60 * 1000L);  // 60분간 서버에서 아무것도 보내지 않으면 타임아웃되도록 설정
         emitters.put(sessionToken, sseEmitter);
-        // 초기 ping 실패 카운트 0으로 초기화
-        pingFailureCounts.put(sessionToken, 0);
 
         // 연결 지속을 위한 ping 보내기 (30초마다)
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 sseEmitter.send(SseEmitter.event().name("ping").data("연결 중단 방지용 ping"));
-                // 성공적으로 ping 전송되면 실패 카운트를 초기화
-                pingFailureCounts.put(sessionToken, 0);
             } catch (IOException e) {
-                int failCount = pingFailureCounts.getOrDefault(sessionToken, 0);
-                failCount++;
-                pingFailureCounts.put(sessionToken, failCount);
                 log.info("ping 전달 실패 사유: {}", e.getMessage());
                 log.warn("❌ ping failed - sessionToken: {}", sessionToken);
-                // 실패 횟수가 MAX_PING_FAILURE_COUNT 초과하면 emitter 삭제
-                if (failCount >= MAX_PING_FAILURE_COUNT) {
-                    log.warn("⚠️ ping 실패 횟수 초과 - emitter 삭제 - sessionToken: {}", sessionToken);
-                    emitters.remove(sessionToken);
-                    scheduler.shutdown(); // 스케줄러 종료
-                }
             }
         }, 30, 30, TimeUnit.SECONDS); // 30초마다
 
         // 한 번 요청이 들어온 후 아래의 로직 떄문에 더이상 알림이 안오는 문제 발생, 잠시 주석 처리
-        // emitter 종료 이벤트 처리 - 클라이언트의 브라우저가 종료되거나 페이지 이동한 경우, .complete() 가 실행돈 경우
-        sseEmitter.onCompletion(() -> {
-            log.info("emitter 삭제: SSE Emitter 정상 종료 - sessionToken: {}", sessionToken);
-            emitters.remove(sessionToken);
-            pingFailureCounts.remove(sessionToken);
-        });
+//        // 사용자에게 모든 데이터 전송되었다면 emitter 삭제
+//        sseEmitter.onCompletion(() -> {
+//            log.info("emitter 삭제: SSE Emitter 정상 종료 - sessionToken: {}", sessionToken);
+//            emitters.remove(sessionToken);
+//        });
         // emitter의 유효시간 만료시 emmitter 삭제
         sseEmitter.onTimeout(() -> {
             log.info("emitter 삭제: SSE Emitter 타임아웃 - sessionToken: {}", sessionToken);
             emitters.remove(sessionToken);
-            pingFailureCounts.remove(sessionToken);
-        });
-        sseEmitter.onError((e) -> {
-            log.warn("🔥 SSE Emitter 에러 발생 - sessionToken: {}", sessionToken);
-            emitters.remove(sessionToken);
-            pingFailureCounts.remove(sessionToken);
         });
 
         // 현재 등록된 Emitter 개수 확인
@@ -88,7 +66,7 @@ public class SseService {
 
         // 503 에러 방지를 위해 초기 더미 데이터 전송
         try {
-            sseEmitter.send(SseEmitter.event().name("connect").data("SSE 구독 성공!").reconnectTime(1000)); // 1초 후 재시도
+            sseEmitter.send(SseEmitter.event().name("connect").data("SSE 구독 성공!"));
         } catch (IOException e) {
             emitters.remove(sessionToken);
             log.error("❌ SSE - 더미 데이터 전송 실패");
@@ -100,9 +78,8 @@ public class SseService {
             @Override
             public void run() {
                 if (emitters.containsKey(sessionToken)) {
-                    log.info("SSE Emitter 강제 삭제 - 24시간 지남 - sessionToken: {}", sessionToken);
+                    log.info("SSE Emitter 강제 삭제 - sessionToken: {}", sessionToken);
                     emitters.remove(sessionToken);
-                    pingFailureCounts.remove(sessionToken);
                 }
             }
         }, 24 * 60 * 60 * 1000); // 24시간 후 강제 삭제
@@ -133,9 +110,8 @@ public class SseService {
             log.info("✅ SSE 메시지 전송 완료!");
 
         } catch (Exception e) {
-            log.error("❌ SSE 메시지 전송 실패 - sessionToken: {} / 이유: {}", sessionToken, e.getMessage());
+            log.error("❌ SSE 메시지 전송 실패 - sessionToken: {} - {}", sessionToken, e.getMessage());
             emitters.remove(sessionToken);
-            pingFailureCounts.remove(sessionToken);
             throw new CustomException(FAILED_TO_SEND_NOTICE, null);
         }
     }
@@ -165,8 +141,7 @@ public class SseService {
         List<SseEmitter> emitterList = new ArrayList<>(emitters.values());
         for (SseEmitter emitter : emitterList) {
             try {
-                emitter.send(SseEmitter.event().name("end").data("연결 정상 종료"));
-                emitter.complete(); // 정상 종료  // emitter.onCompletion 실행됨
+                emitter.complete(); // 정상 종료
             } catch (Exception e) {
                 log.error("SSE 종료 중 오류 발생: {}", e.getMessage());
             }
