@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class IamportClientConfig {
+public class PortOneClientConfig {
 
     @Value("${portone.api-key}")
     private String apiKey;
@@ -18,4 +18,5 @@ public class IamportClientConfig {
     public IamportClient iamportClient() {
         return new IamportClient(apiKey, apiSecret);
     }
+
 }

@@ -1,6 +1,7 @@
 package clovar.howkiki.domain.order.entity;
 
 public enum OrderStatus {
+    WAITING_FOR_PAYMENT, // 결제 대기
     NOT_YET_SENT, // 주문 전송 대기
     AWAITING_ACCEPTANCE,  // 접수 대기
     IN_PROGRESS,  // 조리중
