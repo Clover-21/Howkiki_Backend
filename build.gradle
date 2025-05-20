@@ -21,6 +21,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' } // portone rest api 연동 모듈 사용 위함
 }
 
 dependencies {
@@ -34,6 +35,9 @@ dependencies {
 
 	// S3 접근 위한 aws 의존성 추가
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// 포트원 REST API 연동 모듈
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 
 	// hibernate 의존성 명시 추가
 	implementation 'org.hibernate.orm:hibernate-core:6.2.10.Final'

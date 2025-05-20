@@ -39,7 +39,14 @@ public enum ErrorCode {
 
     // menu
     MENU_NAME_ALREADY_EXISTS(BAD_REQUEST, "이미 존재하는 메뉴 이름입니다."),
-    FAILED_TO_UPLOAD_IMG(INTERNAL_SERVER_ERROR, "파일 업로드에 실패하였슴니다.");
+    FAILED_TO_UPLOAD_IMG(INTERNAL_SERVER_ERROR, "파일 업로드에 실패하였슴니다."),
+
+    // pay
+    FAILED_TO_GET_TOKEN(BAD_REQUEST, "PortOne 액세스 토큰 요청 실패"),
+    FAILED_TO_GET_PAYMENT_INFO(BAD_REQUEST, "PortOne - 결제 정보 조회 실패"),
+    AMOUNT_NOT_EQUAL(FORBIDDEN, "결제 금액 불일치: 위조 가능성"),
+    NOT_PAID(BAD_REQUEST, "결제가 완료되지 않았습니다.");
+
 
     private final HttpStatus status;
     private final String message;
