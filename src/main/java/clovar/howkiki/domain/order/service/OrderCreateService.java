@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static clovar.howkiki.domain.order.entity.OrderStatus.USER_CANCELLED;
+import static clovar.howkiki.domain.order.entity.OrderStatus.*;
 import static clovar.howkiki.global.exception.ErrorCode.*;
 
 @Service
@@ -65,8 +65,7 @@ public class OrderCreateService {
                 .isTakeOut(requestDto.getIsTakeOut())
                 .tableNumber(requestDto.getTableNumber())
                 .orderPrice(orderPrice)
-//                .status(OrderStatus.WAITING_FOR_PAYMENT)  // 결제 구현 후  기본상태 : WAITING_FOR_PAYMENT
-                .status(OrderStatus.NOT_YET_SENT)  // 기본상태 : NOT_YET_SENT
+                .status(WAITING_FOR_PAYMENT)  // 결제 구현 후  기본상태 : WAITING_FOR_PAYMENT
                 .build();
         // 주문 저장
         Order savedOrder = orderRepository.save(order);
@@ -74,11 +73,11 @@ public class OrderCreateService {
         // *Order Detail 객체 생성
         List<OrderDetailDto> savedOrderDetail = createOrderDetail(savedOrder, orderDetails, storeId);
 
-        // 스케줄러 호출 - 30초 후 상태 AWAITING_ACCEPTANCE로 변경
-        scheduleOrderStatusUpdate(order, methodUrl);
-
-        // 스케줄러 호출 - 새로운 주문 도착 알림 발송
-        scheduleNewOrderNotice(order, methodUrl);
+//        // 스케줄러 호출 - 30초 후 상태 AWAITING_ACCEPTANCE로 변경
+//        scheduleOrderStatusUpdate(order, methodUrl);
+//
+//        // 스케줄러 호출 - 새로운 주문 도착 알림 발송
+//        scheduleNewOrderNotice(order, methodUrl);
 
         // 응답 dto 생성 및 반환
         return OrderResponseDto.fromWithOrderDetail(savedOrder, savedOrderDetail);
@@ -147,7 +146,7 @@ public class OrderCreateService {
             }
 
             try {
-                order.updateStatus(OrderStatus.AWAITING_ACCEPTANCE);
+                order.updateStatus(AWAITING_ACCEPTANCE);
                 orderRepository.save(order);
                 log.info("orderId: " + order.getOrderId() + " - 상태가 AWAITING_ACCEPTANCE로 변경되었습니다.");
             } catch (Exception e){
@@ -155,7 +154,7 @@ public class OrderCreateService {
             } finally {
                 scheduler.shutdown();  // 작업 완료 후 스레드 풀 종료 - 자원 낭비 방지!
             }
-        }, 30, TimeUnit.SECONDS); // 30초 설정 
+        }, 30, TimeUnit.SECONDS); // 30초 설정
     }
 
     // 메서드 호출 후 30초 후 알림 전송
