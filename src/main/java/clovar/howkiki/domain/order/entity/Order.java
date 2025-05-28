@@ -46,7 +46,7 @@ public class Order extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private OrderStatus status; // NOT_YET_SENT, AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED, PAID, USER_CANCELLED, ADMIN_CANCELLED
+    private OrderStatus status; // WAITING_FOR_PAYMENT, NOT_YET_SENT, AWAITING_ACCEPTANCE, IN_PROGRESS, COMPLETED, PAID, USER_CANCELLED, ADMIN_CANCELLED
 
     @Enumerated(EnumType.STRING)
     private CancelReason cancelReason;

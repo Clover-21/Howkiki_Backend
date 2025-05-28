@@ -51,15 +51,15 @@ public class PaymentService {
             throw new CustomException(NOT_PAID, methodUrl);
         }
 
-        // *결제가 완료된 경우 ORDER 상태 변경
+        // *결제가 완료된 경우 ORDER 주문 상태 변경
         if ("paid".equals(status)) {
             orderUpdateService.updateOrderStatus(order.getStore().getStoreId(), order.getOrderId(), OrderStatus.NOT_YET_SENT);
 
-//            // 스케줄러 호출 - 30초 후 상태 AWAITING_ACCEPTANCE로 변경
-//            orderCreateService.scheduleOrderStatusUpdate(order, methodUrl);
-//
-//            // 스케줄러 호출 - 새로운 주문 도착 알림 발송
-//            orderCreateService.scheduleNewOrderNotice(order, methodUrl);
+            // 스케줄러 호출 - 30초 후 상태 AWAITING_ACCEPTANCE로 변경
+            orderCreateService.scheduleOrderStatusUpdate(order, methodUrl);
+
+            // 스케줄러 호출 - 새로운 주문 도착 알림 발송
+            orderCreateService.scheduleNewOrderNotice(order, methodUrl);
         }
 
         // 5. payment 객체 생성
