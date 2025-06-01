@@ -179,7 +179,7 @@ public class OrderCreateService {
             } finally {
                 scheduler.shutdown();  // 작업 완료 후 스레드 풀 종료 - 자원 낭비 방지!
             }
-        }, 30, TimeUnit.SECONDS); // 데모를 위해 30초 -> 0초로 변경
+        }, 0, TimeUnit.SECONDS); // 데모를 위해 30초 -> 0초로 변경
     }
 
 }
