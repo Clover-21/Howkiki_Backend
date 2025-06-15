@@ -1,11 +1,8 @@
 # 🤖 하우키키
-### 📌 [캡스톤디자인 프로젝트 23팀] 하우키키 백엔드 레포지토리입니다
+>  고객의 상황을 반영한 응대와 주문 결제 자동화를 제공하는 휴먼터치 AI 챗오더
 <br>
 
-### 💡 프로젝트 설명:
->  하우키키는 고객의 상황을 반영한 응대와 주문 결제 자동화를 제공하는 휴먼터치 AI 챗오더입니다. 
-<br>
-
+### 📌 [캡스톤디자인 프로젝트 23팀] 하우키키 백엔드 레포지토리입니다.
 
 ## 🔧 기술 스택
 ### 📌 Backend  
@@ -86,7 +83,7 @@
 │   │           │   │   ├───entity
 │   │           │   │   ├───repository
 │   │           │   │   └───service
-│   │           │   └───suggestion # 사용자 건의사항 생성 및 조회회 기능
+│   │           │   └───suggestion # 사용자 건의사항 생성 및 조회 기능
 │   │           │       ├───controller
 │   │           │       ├───dto
 │   │           │       ├───entity
@@ -123,23 +120,33 @@
 
 <br>
 
-## ⚙️ How to Build
-```bash
-./gradlew clean build
-```
-<br>
-
-## 🚀 How to install
+## 🚀 How to install & Run
 하우키키 백엔드 서버를 로컬에서 실행하기 위한 절차는 다음과 같습니다. 
 
 ### 1️⃣ 프로젝트 클론
 ``` bash
-git clone https://github.com/your-id/howkiki-backend.git](https://github.com/Clover-21/Howkiki_Backend.git
+git clone https://github.com/Clover-21/Howkiki_Backend.git
 cd Howkiki_Backend
 ```
 <br>
 
-### 2️⃣ 설정 파일 생성
+### 2️⃣ MySQL 설정 
+본 프로젝트는 MySQL 8.0 이상을 사용하며, 기본적으로 `howkiki_db`라는 이름의 데이터베이스를 사용합니다.
+이미 로컬 connection이 있는 경우 이 과정은 넘어가셔도 됩니다.
+> ⚠️ MySQL의 사용자 이름과 비밀번호는 각자의 로컬 설정에 따라 다르므로 본인의 환경에 맞게 작성해 주세요.
+
+1. 🐬 MySQL Workbench 실행 후, 좌측 상단의 **+ 버튼(New Connection)** 클릭
+2. **Connection Name**: `howkiki_local` (자유롭게 설정 가능)
+3. **Username**: `root` 또는 본인 설정
+4. **Password**: 저장해둔 비밀번호 입력
+5. **Test Connection** 버튼 클릭 → 성공 확인 후 저장
+6. cf) 아래 명령어로 데이터베이스를 수동으로 생성할 수 있습니다 (프로젝트 실행시 자동 생성되므로 옵션사항):
+ ```sql
+CREATE DATABASE IF NOT EXISTS howkiki_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+<br>
+
+### 3️⃣ 설정 파일 생성 (application.yml)
 - src/main/resource 위치에 application.yml 파일을 아래 형식으로 생성합니다.
 - 데이터베이스, AWS S3 연동, 외부 결제 API 연동을 위한 정보를 설정합니다.
 - 여기서 [ ] 부분에 실제 값 또는 키 값을 작성해야 합니다.
@@ -182,7 +189,7 @@ portone:
 ```
 <br>
 
-### 3️⃣ 애플리케이션 실행
+### 4️⃣ 애플리케이션 실행
 ``` bash
 ./gradlew bootRun
 ```
@@ -235,3 +242,19 @@ portone:
 ![하우키키_SW구조도](https://github.com/user-attachments/assets/de43cbfc-c65b-4474-8839-6574c2ba3b6b)
 
 <br>
+
+## 📚 Description of Used Open Source
+본 프로젝트는 다음과 같은 오픈소스 라이브러리를 기반으로 개발되었습니다.
+
+| 라이브러리 | 설명 | 사용 목적 |
+|------------|------|------------|
+| [Spring Boot](https://spring.io/projects/spring-boot) | Java 기반 애플리케이션 프레임워크 | 웹 서버 및 애플리케이션 구조 제공 |
+| [Spring Data JPA](https://spring.io/projects/spring-data-jpa) | ORM(Object-Relational Mapping) 지원 | Java 객체 ↔ DB 테이블 매핑 자동화 |
+| [Spring Security](https://spring.io/projects/spring-security) | 인증/인가 프레임워크 | 보안 설정 및 API 보호 |
+| [Lombok](https://projectlombok.org/) | 반복 코드 생략을 위한 애너테이션 처리기 | Getter/Builder 자동 생성 |
+| [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) | MySQL용 JDBC 드라이버 | DB 연결 |
+| [AWS SDK for Java (S3)](https://github.com/aws/aws-sdk-java) | AWS 서비스 연동 | 이미지 파일 S3 업로드 및 버킷 관리 |
+| [PortOne REST Client](https://github.com/iamport/iamport-rest-client-java) | 포트원 결제 연동 모듈 | 결제 API 호출 및 상태 검증 |
+| [Hibernate](https://hibernate.org/) | JPA 구현체 | Entity 기반 DB 조작 기능 구현 |
+
+
