@@ -2,8 +2,12 @@
 >  고객의 상황을 반영한 응대와 주문 결제 자동화를 제공하는 휴먼터치 AI 챗오더
 <br>
 
-### 📌 [캡스톤디자인 프로젝트 23팀] 하우키키 백엔드 레포지토리입니다.
+### 🎙️ [캡스톤디자인 프로젝트 23팀] 하우키키 백엔드 레포지토리입니다.
+- 하우키키 백엔드 서버는 Spring Boot 기반의 REST API 애플리케이션으로, 챗오더 및 관리자 페이지를 위한 주문, 결제, 알림, 매장 관리 기능을 제공합니다.
+- SSE 기반 알림, AWS S3 이미지 저장, PortOne 결제 API 등을 연동하였으며, AWS EC2와 GitHub Actions를 활용한 CI/CD 자동 배포 환경을 구축하였습니다.
 <br>
+
+---
 
 ## 🔧 기술 스택
 ### 📌 Backend  
@@ -35,6 +39,8 @@
 - **Deployment :** AWS EC2, AWS RDS, Nginx, GitHub Actions + AWS CodeDeploy 기반 CI/CD
 
 <br>
+
+---
 
 ## 📁 Source Code 설명
 ### 1️⃣ 프로젝트 구조
@@ -121,6 +127,8 @@
 
 <br>
 
+---
+
 ## 🚀 How to install & Run
 하우키키 백엔드 서버를 로컬에서 실행하기 위한 절차는 다음과 같습니다. 
 
@@ -196,6 +204,8 @@ portone:
 ```
 <br>
 
+---
+
 ## 💿 Sample Data 
 - 아래의 샘플 SQL을 통해 초기 `Store`, `Menu` 데이터를 삽입할 수 있습니다. <br>
 (API를 통해 생성할 수도 있으나 테스트 편의를 위해 제공)
@@ -211,6 +221,8 @@ portone:
 2. `sample-data.sql` 파일을 불러와 실행
    
 <br>
+
+---
 
 ## ⚙️ How to Test
 - 하우키키 백엔드 서버의 주요 기능은 REST API 형태로 제공됩니다.  
@@ -230,9 +242,11 @@ portone:
 
 ### 3️⃣ 테스트 예시 화면
 - 주문 생성 예시
-![하우키키_주문생성예시](https://github.com/user-attachments/assets/6c5613bf-7a90-47a9-846c-0244ba350a3c)
+<img src="https://github.com/user-attachments/assets/6c5613bf-7a90-47a9-846c-0244ba350a3c" width="500px" />
 
 <br> 
+
+---
 
 ## 💾 ERD
 ![하우키키_ERD)](https://github.com/user-attachments/assets/acd196e2-f447-490a-b264-70e7c01ca6f9)
